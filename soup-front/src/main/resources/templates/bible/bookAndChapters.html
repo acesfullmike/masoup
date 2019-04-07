@@ -1,0 +1,124 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>圣经目录</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script type="text/javascript" th:inline="javascript">
+		$(document).ready(function() {
+			initBase();
+			initData();
+		});
+		
+		function initData() {
+			$("#major").css("table-layout", "fixed");
+			var title = [[${title}]];
+			htmlTitle(title);
+			var cols = 1;
+			$("#flog").attr("colspan", cols);
+			$("#fargo").attr("placeholder", "Search " + title).focus();
+			var items = [[${items}]];
+			if(!items) {
+				return;
+			}
+
+			var version = [[${version}]];
+			var styles = ["primary", "success", "info", "warning", "danger"];
+			for(var i = 0; i < items.length; i++) {
+				var book = items[i];
+				var bookInfo = "#" + book.bid + ",    " + book.bname;
+				var row = $("<tr></tr>");
+				var td = $("<td></td>");
+				var indexA = i % styles.length;
+				var styleA = styles[indexA];
+				var labelA = $("<label></label>").text(bookInfo).addClass("label label-" + styleA).css("font-size", 16);
+				td.css("word-wrap", "break-word");
+				td.append(labelA).append("&nbsp;");
+				var cids = book.cids;
+				for(var kdx = 0; kdx < cids.length; kdx++) {
+					var cid = cids[kdx];
+					var href = "/sirap/bible/verses/" + book.bid + "/" + cid + "?v=" + version;
+					var labelB = $("<input></input>").attr("type", "button").val(cid).addClass("btn btn-sm btn-default");
+					var chapter = $("<a></a>").append(labelB).attr("href", href);
+					td.append(chapter);
+					if(kdx != cids.length) {
+						td.append("&nbsp;&nbsp;");
+					}
+				}
+				row.append(td);
+				$("#myGrid").append(row);
+			}
+		}
+		
+		function initBase() {
+			  $(".search").keyup(function () {
+			    var searchTerm = $(".search").val();
+			    var listItem = $('.results tbody').children('tr');
+			    var searchSplit = searchTerm.replace(/ /g, "'):containsi('")
+			    
+			  $.extend($.expr[':'], {'containsi': function(elem, i, match, array){
+			        return (elem.textContent || elem.innerText || '').toLowerCase().indexOf((match[3] || "").toLowerCase()) >= 0;
+			    }
+			  });
+			    
+			  $(".results tbody tr").not(":containsi('" + searchSplit + "')").each(function(e){
+			    $(this).attr('visible','false');
+			  });
+
+			  $(".results tbody tr:containsi('" + searchSplit + "')").each(function(e){
+			    $(this).attr('visible','true');
+			  });
+
+			  var jobCount = $('.results tbody tr[visible="true"]').length;
+			    $('.counter').text(jobCount + ' record(s).');
+
+			  if(jobCount == '0') {$('.no-result').show();}
+			    else {$('.no-result').hide();}
+			  });
+		}
+	</script>
+	<style type="text/css">
+	.results tr[visible='false'],
+	     .no-result{
+	       display:none;
+	     }
+	     .results tr[visible='true']{
+	       display:table-row;
+	     }
+     .counter{
+       padding:8px; 
+       color:#ccc;
+     }
+      
+	.h100 {
+		height:400px;
+	}
+	.m40 {
+		margin: 10px;
+	}
+	.middlecenter {
+		vertical-align:middle; 
+		text-align:center;
+	}
+	</style>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+	<div class="margin10">
+		<div class="form-group pull-left">
+		<input id="fargo" type="text" class="search form-control" placeholder="Search">
+	</div>
+	<span class="counter pull-left"></span>
+    <table id="major" class="table table-hover table-bordered results">
+      <tbody id="myGrid">
+        <tr class="warning no-result">
+          <td id="flog"><i class="fa fa-warning"></i>No matching records</td>
+        </tr>
+      </tbody>
+    </table>
+	</div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>织望科技 - 文件列表</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script th:inline="javascript">
+		$(document).ready(function() {
+			showInfo();
+		});
+		
+		function showInfo() {
+			var result = [[${result}]];
+			if(result != null) {
+				for(var k = 0; k < result.length; k++) {
+					var item = result[k];
+					console.log(item);
+					var error = item.error;
+					if(error != null) {
+						var div = $("<div></div>").attr("align", "center");
+						div.addClass("alert alert-danger");
+						div.text(item.error);
+						$("#result").append(div);
+					} else {
+						var name = item.name;
+						var anchor = $("<a></a>").attr("href", item.viewurl).text("成功上传文件：" + item.finalname);
+						var div = $("<div></div>").attr("align", "center");
+						div.addClass("alert alert-info");
+						div.append(anchor);
+						$("#result").append(div);
+					}
+				}
+			}
+		}
+	</script>
+	<style type="text/css">
+	pre {
+		white-space: pre-wrap;
+		word-wrap: break-word;
+	}
+	.auto {
+		word-wrap:break-word;
+		word-break:break-all;
+	}
+	</style>
+</head>
+<body>
+	<div th:replace="header::bodyHead"></div>
+	
+	<div class="margin6">
+	    <div id="result"></div>
+	    <table class="table">
+           <tr>
+               <td width="50%" align="right">
+	               <input class="btn btn-success btn-sm" type="button" onclick="window.open('/file/up_input', '_self')" value="继续上传"/>
+               </td>
+               <td width="50%" align="left">
+	               <input class="btn btn-primary btn-sm" type="button" onclick="window.open('/file/list', '_self')" value="查看文件列表"/>
+               </td>
+           </tr>
+	    </table>
+	</div>
+	
+    <div th:replace="footer::copyright"></div>
+</body>
+</html>

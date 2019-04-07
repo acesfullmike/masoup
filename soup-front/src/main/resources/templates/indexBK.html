@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>织望科技 - 编织希望，迎接未来</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script type="text/javascript">
+		
+		function initSearch() {
+			$(".search").keyup(function () {
+			    var searchTerm = $(".search").val();
+			    var listItem = $('.results tbody').children('tr');
+			    var searchSplit = searchTerm.replace(/ /g, "'):containsi('")
+			    
+				  $.extend($.expr[':'], {'containsi': function(elem, i, match, array){
+				        return (elem.textContent || elem.innerText || '').toLowerCase().indexOf((match[3] || "").toLowerCase()) >= 0;
+				    }
+				  });
+				    
+				  $(".results tbody tr").not(":containsi('" + searchSplit + "')").each(function(e){
+				    $(this).attr('visible','false');
+				  });
+				
+				  $(".results tbody tr:containsi('" + searchSplit + "')").each(function(e){
+				    $(this).attr('visible','true');
+				  });
+				
+				  var jobCount = $('.results tbody tr[visible="true"]').length;
+				    $('.counter').text(jobCount + ' record(s).');
+				
+				  if(jobCount == '0') {$('.no-result').show();}
+				    else {$('.no-result').hide();}
+	  		});
+		}
+		
+		$(document).ready(function() {
+			initSearch();
+				var items = [
+					["老覃公车","sword/up_input"],
+					["文件上传","file/up_input"],
+					["安全控制","user"],
+					["实战演练","pure/play"],
+			    	["国土安全第七季 Wiki","https://en.wikipedia.org/wiki/Homeland_(season_7)"],
+			    	["国土安全第七季 下载","http://www.meijutt.com/content/meiju23287.html"],
+			    	["Github Mas项目源代码","https://github.com/acesfullmike/mas"],
+			    	["Github Mas运行文件","https://github.com/acesfullmike/masrun"],
+			    	["Github Mas帮助文档","https://raw.githubusercontent.com/acesfullmike/masrun/master/help.txt"],
+			    ];
+			    
+				  
+				  
+				  clearTable();
+				  loadData(items);
+		});  
+		
+		function clearTable() {
+				$("#detail tbody tr").remove();
+		}
+	
+		function loadData(items) {
+    		for(var i = 0; i < items.length; i++) {
+        		var item = items[i];
+            insertTable(item[1], item[0]);
+        }
+		}
+		
+		function insertTable(href, name) {
+					var lines = [];
+             lines.push('<td scope="row"><a href="' + href + '">' + name + '</a></td>');
+             var line = lines.join('');
+			
+					$("<tr></tr>").append(line).appendTo("#detail tbody");
+		}
+	</script>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+
+	<div class="margin6">
+	    <table id="detail" class="table table-hover results">
+	      <thead>
+	        <tr>
+	          <input type="text" class="search form-control" placeholder="Search">
+	        </tr>
+	        <tr class="warning no-result">
+	          <td colspan="7"><i class="fa fa-warning"></i>No matching records</td>
+	        </tr>
+	      </thead>
+	      <tbody>
+	      </tbody>
+	    </table>
+	</div>
+	
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

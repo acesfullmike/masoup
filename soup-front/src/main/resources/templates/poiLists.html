@@ -1,0 +1,245 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>POI兴趣点地图集</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script th:inline="javascript">
+		$(document).ready(function() {
+			showInfo();
+			createList();
+		});
+		
+		function showInfo() {
+			var result = [[${result}]];
+			if(result != null) {
+				for(var k = 0; k < result.length; k++) {
+					var item = result[k];
+					var alert = item.error;
+					if(alert != null) {
+						var div = $("<div></div>").attr("align", "center");
+						div.addClass("alert alert-danger");
+						div.text(alert);
+						$("#result").append(div);
+					} 
+					
+					alert = item.info;
+					if(alert != null) {
+						var div = $("<div></div>").attr("align", "center");
+						div.addClass("alert alert-info");
+						div.text(alert);
+						$("#result").append(div);
+					} 
+				}
+			}
+		}
+		
+		function showInfox() {
+			var alert = [[${info}]];
+			if(alert != null) {
+				var div = $("<div></div>").attr("align", "center");
+				div.addClass("alert alert-info");
+				div.text(alert);
+				$("#result").append(div);
+			}
+			
+			var alert = [[${error}]];
+			if(alert != null) {
+				var div = $("<div></div>").attr("align", "center");
+				div.addClass("alert alert-danger");
+				div.text(alert);
+				$("#result").append(div);
+			}
+		}
+		
+		function createList() {
+			//all and stray
+			var extraList = [[${extraList}]];
+			if(extraList) {
+				for(var k = 0; k < extraList.length; k++) {
+					var extra = extraList[k];
+					var name = extra.name;
+					var size = extra.size;
+					var id = extra.id;
+					if(size <= 0) {
+						continue;
+					}
+					
+					var row = $("<tr><td></td><td></td></tr>");
+					var td = $("<td></td>");
+					
+					var element = $("<input></input>").attr("type", "button");
+					element.val(name);
+					element.attr("data-id", id);
+					element.addClass("btn btn-sm").addClass("btn-default");
+					element.click(function() {
+						var hrefMap = "/poi/items/" + $(this).data("id") + "/map";
+						window.open(hrefMap);
+					});
+
+					var sizeInfo = "(" + size + "个兴趣点)";
+		    		var span = "<span>" + sizeInfo + "</span>";
+		    		var td = $("<td></td>").append(element).append("&nbsp;&nbsp;").append(sizeInfo);
+		    		td.addClass("auto");
+		    		row.append(td);
+		    		
+		    		$("#list").append(row);
+				}
+			}
+			//poiLists
+			var poiLists = [[${listitems}]];
+			console.log(poiLists);
+			$("#count").text(poiLists.length);
+			var itemCount = 0;
+			for(var k = 0; k < poiLists.length; k++) {
+				var lista = poiLists[k];
+				var name = lista.name;
+				var size = lista.size;
+				var id = lista.id;
+				var username = lista.username;
+				if(username == null) {
+					username = "user#" + lista.userId;
+				}
+				var canModify = lista.canModify;
+				var canRemove = lista.canRemove;
+				itemCount += size;
+				
+				var row = $("<tr></tr>");
+				var td = $("<td></td>");
+				if(canRemove) {
+					$("#myRemove").removeClass("hide");
+					var span = $("<span></span>").addClass("middleright glyphicon glyphicon-remove remove").attr("data-id", id);
+					span.click(function (){
+						var hrefRemove = "/poi/list/" + $(this).data("id") + "/remove";
+						window.location.href=hrefRemove;
+					});
+					td.append(span);
+				}
+				row.append(td);
+				
+				td = $("<td></td>");
+				if(canModify) {
+					$("#myEdit").removeClass("hide");
+					var span = $("<span></span>").addClass("middleright glyphicon glyphicon-edit edit").attr("data-id", id);
+					span.click(function (){
+						var hrefEdit = "/poi/list/" + $(this).data("id") + "/edit";
+						window.location.href=hrefEdit;
+					});
+					td.append(span);
+				}
+				row.append(td);
+				
+				var nameAndSize = name + " (" + size + ")";
+				
+				var element = $("<input></input>").attr("type", "button");
+				element.val(name);
+				element.attr("data-id", id);
+				var btnType = lista.public ? "btn-success" : "btn-warning"; 
+				element.addClass("btn btn-sm").addClass(btnType);
+				element.click(function() {
+					var hrefMap = "/poi/list/" + $(this).data("id") + "/map";
+					window.open(hrefMap);
+				});
+
+				var href = "/poi/list/" + id;
+	    		var anchor = $("<a>编辑</a>").attr("target", "_self");
+	    		anchor.attr("href", href);
+	    		
+	    		var span = "<span>" + size + "个兴趣点, " + username + "</span>";
+	    		var td = $("<td></td>").append(element).append("&nbsp;&nbsp;").append(span);
+	    		td.addClass("auto");
+	    		row.append(td);
+	    		
+	    		$("#list").append(row);
+	    		$("#itemCount").text(itemCount);
+			}
+		}
+		
+		function spread() {
+			var val = $("#mySpread").prop("checked");
+			console.log(val);
+			$("#myGrid input:checkbox").each(function(){
+				$(this).prop("checked", val);
+			});
+		}
+		
+		function remove() {
+			var count = 0;
+			$("#myGrid input:checkbox:checked").each(function(){
+				count++;
+				var filename = $(this).data("filename");
+				var hidden = $("<input></input>").attr("type", "hidden");
+				hidden.attr("name", "xfilename");
+				hidden.val(filename);
+				$("#myForm").append(hidden);
+			});
+			
+			if(count > 0) {
+				$("#myForm").submit();
+			} else {
+				$("#mySpread").focus();
+			}
+			
+//			alert("删除选定的文件");
+		}
+		
+		function refresh() {
+			var url = "/poi/lists";
+			window.location.href = url;
+		}
+		
+		function addList() {
+			var listId = [[${listId}]];
+			var url = "/poi/lists/addPage";
+			window.location.href = url;
+		}
+		
+		function addItem() {
+			var listId = [[${listId}]];
+			var url = "/poi/item/create";
+			window.location.href = url;
+		}
+	</script>
+	<style type="text/css">
+	pre {
+		white-space: pre-wrap;
+		word-wrap: break-word;
+	}
+	.auto {
+		word-wrap:break-word;
+		word-break:break-all;
+	}
+	</style>
+</head>
+<body>
+	<div th:replace="header::bodyHead"></div>
+	
+	<div class="margin10">
+		<div id="result"></div>
+		<ul class="list-group">
+		<li class="font20 list-group-item active">兴趣点地图 (<span id="count">xxx</span>张)</li>
+	    </ul>
+		<div>
+	        <input class="btn btn-primary btn-sm" type="button" onclick="refresh();" value="刷新" />&nbsp;</span>
+	        <input class="btn btn-success btn-sm" type="button" onclick="addList();" value="+地图" />&nbsp;</span>
+	        <input class="btn btn-info btn-sm" type="button" onclick="addItem();" value="+兴趣点" />&nbsp;</span>
+	        <span>(共<span id="itemCount">0</span>个兴趣点)</span>
+	    </div>
+		
+	    <table id="myGrid" class="table table-hover bordered">
+	    	<thead>
+	    		<tr>
+	    			<td width="1%" id="myRemove" class="hidex"></td>
+	    			<td width="1%" id="myEdit" class="hidex"></td>
+	    			<td></td>
+	    		</tr>
+	    	</thead>
+	        <tbody id="list">
+	        </tbody>
+	    </table>
+	</div>
+	
+    <div th:replace="footer::copyright"></div>
+</body>
+</html>

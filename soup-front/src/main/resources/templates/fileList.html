@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>织望科技 - 文件列表</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script th:inline="javascript">
+		$(document).ready(function() {
+			createList();
+			showInfo();
+		});
+		
+		function showInfo() {
+			var result = [[${result}]];
+			if(result != null) {
+				for(var k = 0; k < result.length; k++) {
+					var item = result[k];
+					console.log(item);
+					var alert = item.error;
+					if(alert != null) {
+						var div = $("<div></div>").attr("align", "center");
+						div.addClass("alert alert-danger");
+						div.text(alert);
+						$("#result").append(div);
+					} 
+					
+					alert = item.info;
+					if(alert != null) {
+						var div = $("<div></div>").attr("align", "center");
+						div.addClass("alert alert-info");
+						div.text(alert);
+						$("#result").append(div);
+					} 
+				}
+			}
+		}
+		
+		function showInfox() {
+			var alert = [[${info}]];
+			if(alert != null) {
+				var div = $("<div></div>").attr("align", "center");
+				div.addClass("alert alert-info");
+				div.text(alert);
+				$("#result").append(div);
+			}
+			
+			var alert = [[${error}]];
+			if(alert != null) {
+				var div = $("<div></div>").attr("align", "center");
+				div.addClass("alert alert-danger");
+				div.text(alert);
+				$("#result").append(div);
+			}
+		}
+		
+		function createList() {
+			var issuper = [[${issuper}]];
+			if(issuper) {
+				$("#myRemove").removeClass("hide");
+				$("#myBoxHead").removeClass("hide");
+			}
+			
+			var fileitems = [[${fileitems}]];
+			$("#count").text(fileitems.length);
+			for(var k = 0; k < fileitems.length; k++) {
+				var item = fileitems[k];
+				var filename = item.name;
+				var filesize = item.size;
+				var istxt = item.istxt;
+				var isimage = item.isimage;
+				
+				var target = "_self";
+				var href = "/file/view/" + filename;
+				
+				var row = $("<tr></tr>");
+				
+				if(issuper) {
+					var mybox = $("<input></input>").attr("type", "checkbox");
+					mybox.attr("data-filename", filename);
+					var td = $("<td></td>").append(mybox);
+					row.append(td);
+				}
+				
+	    		var anchor = $("<a>" + filename + "</a>").attr("target", target);
+	    		anchor.attr("target", target);
+	    		anchor.attr("href", href);
+	    		
+	    		var td = $("<td></td>").attr("width", "88%").append(anchor);
+	    		td.addClass("auto");
+	    		row.append(td);
+	    		
+	    		if(isimage) {
+	    			row.css("background", "rgb(189,219,245)");
+	    		} else if(istxt) {
+	    			//do nothing
+	    		} else {
+	    			row.css("background", "rgb(200,191,231)");
+	    		}
+
+	    		var span = $("<span>" + filesize + "</span>").attr("text", filesize);
+	    		span.css("vertical-align", "middle");
+	    		td = $("<td></td>").append(span);
+	    		row.append(td);
+	    		
+	    		$("#list").append(row);
+			}
+		}
+		
+		function spread() {
+			var val = $("#mySpread").prop("checked");
+			console.log(val);
+			$("#myGrid input:checkbox").each(function(){
+				$(this).prop("checked", val);
+			});
+		}
+		
+		function remove() {
+			var count = 0;
+			$("#myGrid input:checkbox:checked").each(function(){
+				count++;
+				var filename = $(this).data("filename");
+				var hidden = $("<input></input>").attr("type", "hidden");
+				hidden.attr("name", "xfilename");
+				hidden.val(filename);
+				$("#myForm").append(hidden);
+			});
+			
+			if(count > 0) {
+				$("#myForm").submit();
+			} else {
+				$("#mySpread").focus();
+			}
+			
+//			alert("删除选定的文件");
+		}
+		
+		function refresh() {
+			var url = "/file/list";
+			window.location.href = url;
+		}
+		
+	</script>
+	<style type="text/css">
+	pre {
+		white-space: pre-wrap;
+		word-wrap: break-word;
+	}
+	.auto {
+		word-wrap:break-word;
+		word-break:break-all;
+	}
+	</style>
+</head>
+<body>
+	<div th:replace="header::bodyHead"></div>
+	
+	<div class="margin10">
+		<div id="result"></div>
+		<h2 id="top">文件(<span id="count">xxx</span>个)</h2>
+		<div>
+			<form id="myForm" action="/file/deleteBatch" method="post">
+	        	<span><input class="btn btn-primary btn-sm" type="button" onclick="refresh();" value="刷新" />&nbsp;</span>
+    	    	<span><input class="btn btn-success btn-sm" type="button" onclick="window.open('/file/up_input', '_self')" value="↑上传" />&nbsp;</span>
+	        	<span id="myRemove" class="hide" ><input class="btn btn-danger btn-sm" type="button" onclick="remove();" value="删除" /></span>
+        	</form>
+	    </div>
+		
+	    <table id="myGrid" class="table table-hover">
+	    	<thead>
+	    		<tr>
+	    			<td width="1%" id="myBoxHead" class="hide">
+	    			<input id="mySpread" type="checkbox" onclick="spread()" />
+	    			</td>
+	    			<td>名称</td>
+	    			<td>大小</td>
+	    		</tr>
+	    	</thead>
+	        <tbody id="list">
+	        </tbody>
+	    </table>
+	</div>
+	
+    <div th:replace="footer::copyright"></div>
+</body>
+</html>

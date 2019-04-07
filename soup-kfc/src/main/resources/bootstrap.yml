@@ -1,0 +1,24 @@
+server:
+  port: 91
+
+spring:
+  application:
+    name: soup-kfc
+  cloud:
+    config:
+      profile: dev
+      uri: http://localhost:82
+
+management:
+  endpoints:    web:      exposure:        include: refresh, info, health   
+  security:
+    enabled: false
+
+info:
+  lover: ah xiu
+  kid: celine
+eureka:
+  instance:    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:80/eureka

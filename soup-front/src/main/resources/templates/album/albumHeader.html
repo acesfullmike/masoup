@@ -1,0 +1,209 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<body>
+	<header th:fragment="listJS">
+		<script src="/js/fish-common.js"></script>
+		<script th:inline="javascript">
+		var currentpage = 0;
+		var mystart = 1;
+		function init() {
+			$("#major").css("table-layout", "fixed");
+			$("#navy").append(addAlbumListNavi(sitename));
+			htmlTitle(sitename + "相册列表");
+			
+			var paramStartpage = [[${param.sp}]];
+			if(paramStartpage) {
+				mystart = paramStartpage;
+			}
+			
+			currentpage = mystart - 1;
+		}
+		
+		var pageParam;
+		var texta = "点击加载更多相册";
+		var textb = "正在加载...";
+		function xmore() {
+			$("#xmore").val(textb);
+			$("#xmore").attr("disabled", true);
+			currentpage++;
+//			console.log("xmore", currentpage);
+			getImagesByPage(currentpage);
+		}
+		
+		function showHref(routerShow, albumurl, backto, backname) {
+			var myhref = routerShow + "/show/" + base64(albumurl);
+			if(backto) {
+				myhref += "?backto=" + backto;
+			}
+			if(backname) {
+				myhref += "&backname=" + encodeURI(backname);
+			}
+			
+			return myhref;
+		}
+		
+		var mytotal = "x";
+		function getImagesByPage(page) {
+			var weburl = router + "/page/" + page;
+			if(pageParam) {
+				weburl += "?who=" + pageParam;
+			}
+
+			var theball = {
+					url : weburl,
+					dataType : "json",
+					success: function(meat) {
+						console.log("At " + page);
+						var photos = meat.photos;
+						var temp = meat.totalpage;
+						if(temp) {
+							mytotal = temp;
+						}
+						var texta = "共" + mytotal + "页，当前第" + page + "页，";
+						console.log(photos.length == 0);
+						if(photos.length != 0) {
+							insertTable(meat);
+							updateOrderNumber();
+							var hasmore = page < mytotal;
+							if(hasmore) {
+								var more = "点击加载下页...";
+								$("#xmore").val(texta + more);
+								$("#xmore").attr("disabled", false);
+							} else {
+								var more = "没有更多了。";
+								$("#xmore").val(texta + more);
+							}
+						} else {
+							var texta = "共" + mytotal + "页，当前" + page + "页没有数据。";
+							$("#xmore").val(texta);
+						}
+			        }
+			}
+			$.ajax(theball);
+		}
+		
+		function updateOrderNumber() {
+			var mycount = $(".mylabor").length;
+			$(".mylabor").each(function(index, element) {
+				var outorder = index + 1;
+				$(this).text("#" + outorder + " / " + mycount);
+			});
+			$("#count").text(mycount);
+		}
+		
+		function getImageCount() {
+			var labelArea = $(this);
+			var flagArea = labelArea.data("asked");
+			if(flagArea) {
+				return;
+			}
+			labelArea.attr("data-asked", true);
+			labelArea.css("cursor", "default");
+			var whenasking = "label-info";
+			labelArea.addClass(whenasking);
+
+			var albumurl = labelArea.parent().find("img").data("albumurl");
+			var base64url = router + "/count/" + base64(albumurl);
+			
+			var webData = {base64url : base64url};
+			console.log(webData);
+			var theball = {
+				url : base64url,
+				dataType : "json",
+				success: function(meat) {
+					var area = meat.count;
+					if(area) {
+						labelArea.text(area + "张");
+					} else {
+						labelArea.addClass("label-danger");
+						labelArea.text("无效");
+						labelArea.parent().find("br").remove();
+						labelArea.parent().find("a").remove();
+					}
+		        }
+			}
+			$.ajax(theball);
+		}
+		</script>
+	</header>
+	
+	<header th:fragment="listHolder">
+		<h2 id="top">
+			<span id="navy"></span>
+			<input class="btn btn-primary btn-sm" type="button" onclick="refresh();" value="刷新" />
+		</h2>
+		
+	    <table id="major" class="table table-hover">
+	    	<tr>
+			  <td>
+			  	<a href="#bottom" style="font-style:italic">去到底部</a>
+			  </td>
+			</tr>
+	        <tbody id="list">
+	        </tbody>
+	        <tbody id="more">
+		        <tr>
+				  <td>
+				  	<input id="xmore" style="width:100%" class="btn btn-success btn-sm" type="button" onclick="xmore();" value="加载更多..." />
+				  </td>
+				</tr>
+		        <tr id="bottom">
+				  <td><a href="#top" style="font-style:italic">回到顶部</a></td>
+				</tr>
+	        </tbody>
+	    </table>
+	</header>
+	
+	<header th:fragment="detailJS">
+		<script th:inline="javascript">
+			function init() {
+				$("#navy").append(addAlbumNavi(sitename, router));
+				$("#major").css("table-layout", "fixed");
+			}
+			
+			function saveto() {
+				var niceurl = [[${niceurl}]];
+				var saveurl = "/album/websave/" + base64(niceurl);
+				window.open(saveurl, "_blank");
+			}
+		</script>
+	</header>
+	
+	<header th:fragment="detailHolder">
+		<div>
+			<h2 id="top">
+				<span id="navy"></span>
+			</h2>
+		</div>
+		
+	    <table id="major" class="table table-hover">
+	    	<thead>
+	    		<tr>
+	    			<td id="tdName" class="niceTD"><label>名称：</label></td>
+	    		</tr>
+	    		<tr>
+	    			<td id="tdDesc" class="hide niceTD"><label>描述：</label></td>
+	    		</tr>
+	    		<tr>
+	    			<td id="tdWhen" class="niceTD"><label>创建于：</label></td>
+	    		</tr>
+	    		<tr>
+	    			<td id="tdTimeago" class="niceTD"><label>创建了：</label></td>
+	    		</tr>
+	    		<tr>
+	    			<td class="niceTD">
+	    				<a href="#bottom" style="font-style:italic">去到底部</a>&nbsp;
+						<input id="mysave" class="btn btn-success btn-sm" type="button" onclick="saveto();" value="保存当前相册" />
+	    			</td>
+	    		</tr>
+	    	</thead>
+	        <tbody id="list">
+	        </tbody>
+	        <tr>
+				  <td id="bottom">
+				  	<a href="#top">回到顶部</a>
+				  </td>
+			</tr>
+	    </table>
+	</header>	
+</body>
+</html>

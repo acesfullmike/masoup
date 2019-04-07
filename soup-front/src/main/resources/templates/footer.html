@@ -1,0 +1,17 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<body>
+<footer th:fragment="copyright">
+<div class="padding-6 align-center darkback">
+&#169; 2014-2018 广西织望科技有限公司 <br/>
+<a class="blueHover white2" href="http://www.miitbeian.gov.cn/publish/query/indexFirst.action" target="_blank">粤ICP备18042360号</a>
+<a class="blueHover white2" href="/assets/ICP.jpg" target="_blank"><img width="12" height="12" src="/assets/ICP.jpg" /></a>
+&nbsp;&nbsp;<a class="blueHover white2" href=mailto:AWEINSPIRING@163.com>AWEINSPIRING@163.com</a>
+<br/>
+<span sec:authorize="isAuthenticated()">
+[V3.6.30-HERBERT  12/2/2018]
+</span>
+</div>
+</footer>
+</body>
+</html>

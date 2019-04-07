@@ -1,0 +1,91 @@
+<!-- 
+最后更新 10:58:59 PM, Tuesday, Feb 27, 2018 GMT+8
+<!-->
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+<title>兴趣点地图</title>
+<link rel="icon" href="/assets/zw-ico.jpg">
+
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+
+<link rel="stylesheet" href="http://webapi.amap.com/ui/1.0/ui/misc/MarkerList/examples/index.css">
+<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src='http://webapi.amap.com/maps?v=1.4.3&key=02a37b38c4b33a671f1cd1584b54adc8'></script>
+<script src="http://webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+
+<script src="/js/fish-common.js"></script>
+<script src="/static/js/shrink.js"></script>
+<script src="/static/js/capture/capturewrapper.js"></script>
+<script src="/static/js/capture/jquery.json-2.3.min.js"></script>
+<script src="/static/js/capture/niuniucapture.js"></script>
+<script src="/static/js/capture/push.js"></script>
+<script src="/static/js/capture/entry.js"></script>
+
+<style type="text/css">
+#btnList li {
+	text-align: right;
+}
+
+audio {
+	width: 100%;
+}
+</style>
+
+<script th:inline="javascript">
+	var xitems;
+	var listId = [[${listId}]];
+	var listName = [[${listName}]];
+
+	$(document).ready(function() {
+		var origin = [[${poiItems}]];
+		xitems = check(origin);
+		fish();
+		htmlTitle(listName);
+	});
+	
+	//1) check DuplicateId
+	//2) check illegal location
+	function check(origin) {
+		var newItems = new Array();
+		var idAndCount = {};
+		for (var i = 0; i < origin.length; i++) {
+			var item = origin[i];
+			var xid = item.name;
+			var location = item.location;
+			if(!checkLnglat(location)) {
+				alert("坐标位置["+xid+"]不合法：" + location);
+				continue;
+			}
+			if(idAndCount.hasOwnProperty(xid)) {
+				var count = idAndCount[xid];
+				var newCount = count + 1;
+				idAndCount[xid] = newCount;
+				item.name = item.name + "-" + newCount;
+			} else {
+				idAndCount[xid] = 1;
+			}
+			newItems.push(item);
+		}
+		
+		return newItems;
+	}
+</script>
+</head>
+
+<body>
+	<div id="outer-box">
+		<div id="container" tabindex="0"></div>
+		<div id="panel" class="scrollbar1">
+			<ul id="myList" />
+		</div>
+		<ul id="btnList" />
+	</div>
+</body>
+
+</html>

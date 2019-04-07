@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Actuator</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script th:inline="javascript">
+
+		$(document).ready(function() {
+			init();
+			fetchActuatorInfo();
+		});
+
+		var sitename = "Actuator";
+		function init() {
+			$("#major").css("table-layout", "fixed");
+			$("#navy").append(addNavi(sitename));
+			htmlTitle(sitename);
+		}
+
+		function updateOrderNumber() {
+			var mycount = $(".mylabor").length;
+			$(".mylabor").each(function(index, element) {
+				var outorder = index + 1;
+				$(this).text(outorder + " / " + mycount);
+			});
+			$("#count").text(mycount);
+		}
+		
+		function addNavi(sitename) {
+			var navi = $("<span></span>");
+			navi.append(anchorOfSelf("Spring", "/techs"));
+			navi.append(" » ").append(sitename);
+			
+			return navi;
+		}
+		
+		function fetchActuatorInfo() {
+			var weburl = "/x/detail";
+
+			var theball = {
+					url : weburl,
+					dataType : "json",
+					success: function(meat) {
+						var links = meat.core._links;
+						insertTable(links);
+						updateOrderNumber();
+			        }
+			}
+			$.ajax(theball);
+		}
+		
+		function insertTable(links) {
+			var k = 0;
+			for(var name in links) {
+				var href = links[name].href;
+//				console.log(name, href);
+				
+				var td = tdOfBreakword();
+				var style = styleK(k++);
+				var labor = labelOf("#").addClass("mylabor label-" + style);
+				td.append(labor);
+				td.append(knbsp(2));
+				
+				td.append(name);
+				td.append(knbsp(2));
+				
+				if(name != "shutdown") {
+					var ak = anchorOf(href, href);
+					td.append(ak);
+				} else {
+					td.append(href);
+				}
+				
+				var tr = $("<tr></tr>").append(td);
+				$("#list").append(tr);
+			}
+		}
+	</script>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+	<div class="margin10">
+		<h2 id="top">
+			<span id="navy"></span>
+			<input class="btn btn-primary btn-sm" type="button" onclick="refresh();" value="刷新" />
+		</h2>
+	
+	    <table id="major" class="table table-hover">
+	    	<tr>
+			  <td>
+			  	<a href="#bottom" style="font-style:italic">去到底部</a>
+			  </td>
+			</tr>
+	        <tbody id="list">
+	        </tbody>
+	        <tbody id="more">
+		        <tr id="bottom">
+				  <td><a href="#top" style="font-style:italic">回到顶部</a></td>
+				</tr>
+	        </tbody>
+	    </table>
+		
+	</div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

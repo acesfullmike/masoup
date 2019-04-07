@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>新增兴趣点地图</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script th:inline="javascript">
+		var listId, listName, isPublic;
+	
+		$(document).ready(function() {
+			showInfo();
+		});
+		
+		var infoUsername = "100个字符以内，如：活在广州";
+
+		function showInfo() {
+			$("#listName").attr("placeholder", infoUsername);
+
+			listId = [[${listId}]];
+			if(listId) {
+				//edit
+				var info = "编辑兴趣点地图";
+				var action = "/poi/list/" + listId + "/update";
+				$("form").attr("action", action);
+				$("title").text(info);
+				$("#head2").text(info);
+			}
+			
+			listName = [[${listName}]];
+			isPublic = [[${isPublic}]];
+
+			if(listName != null) {
+				$("#listName").val(listName);
+			}
+			
+			if(isPublic != null) {
+				$("#isPublic").attr("checked", isPublic);
+			}
+		}
+		
+		function check() {
+			var isChecked = $("#isPublic").prop("checked");
+			console.log(22, isChecked);
+			$("#isPublicX").val(isChecked);
+			var username = $("#listName").val().trim();
+			var len1 = username.length;
+			if(len1 == 0) {
+				$("#listName").val("").focus();
+				return false;
+			} else if(len1 > 100) {
+				alert(infoUsername);
+				$("#listName").focus();
+				return false;
+			}
+			
+			return true;
+		}
+	</script>
+	<style type="text/css">
+	.hide {
+		display:none;
+	}
+	.sign {
+		width:200px;
+	}
+	.width20p {
+		width:25%;
+	}
+	.middleright {
+		vertical-align:middle; 
+		text-align:right;
+	}
+	</style>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+		<h2 id="head2" align="center">
+			新增兴趣点地图
+		</h2>
+       	<div id="error" class="hide alert alert-danger" align="center">
+           	无效的用户名和密码
+		</div>
+        <div id="info" class="hide center alert alert-info" align="center">
+			你已经退出系统
+        </div>
+		<form id="myForm" action="/poi/lists/addNew" method="post" onsubmit="return check();" >
+			<input id="isPublicX" type="hidden" name="isPublic">
+		    <table id="detail" class="table">
+		      <tr>
+		        <td class="width20p">
+		        	<span class="middleright form-control">名称: </span>
+		        </td>
+		        <td class="width80p" colspan="2">
+		        <input id="listName" class="form-control" name="listName" type="text" required autofocus />
+		        </td>
+		      </tr>
+		      <tr>
+		        <td />
+		        <td width="38%">
+			        <input class="form-control btn btn-primary btn-sm" type="submit" value="保存" />
+		        </td>
+		        <td style="vertical-align:middle;color:green">
+		        	<input id="isPublic" checked type="checkBox">
+		        	<span>所有人可见</span>
+		        </td>
+		      </tr>
+		    </table>
+	    </form>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

@@ -1,0 +1,14 @@
+server:
+  port: 90
+
+spring:
+  application:
+    name: soup-sos
+
+eureka:
+  instance:    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:80/eureka
+info:
+  head: my sos, your sos, http://www.aka10.com

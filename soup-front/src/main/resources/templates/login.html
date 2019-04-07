@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>登录</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script th:inline="javascript">
+		$(document).ready(function() {
+			init();
+			showHide();								
+		});
+		
+		function init() {
+			var whereto = [[${param.comefrom}]];
+			var encoded = "";
+			if(whereto != null) {
+				encoded = encodeURI(whereto);
+			}
+			
+			var hi = $("<input></input>").attr("type", "hidden");
+			hi.attr("name", "whereto").val(encoded);
+			console.log(999, whereto, hi.val());
+			console.log(encodeURI(whereto));
+			$("form").append(hi);
+		}
+		
+		function showHide() {
+			var info = [[${info}]];
+			if(info != null) {
+				$("#info").removeClass("hide");
+				$("#info").text(info);
+			}
+			
+			var error = [[${error}]];
+			if(error != null) {
+				$("#error").removeClass("hide");
+				$("#error").text(error);
+			}
+			
+			var username = [[${username}]];
+			if(username != null) {
+				$("#username").val(username);
+			} else {
+				$("#username").val("");
+			}
+			
+			var password = [[${password}]];
+			if(password != null) {
+				$("#password").val(password);
+			} else {
+				$("#password").val("");
+			}
+		}
+		
+		function toSignupPage() {
+			var path = "/signup";
+			window.location.href = path;
+		}
+	</script>
+	<style type="text/css">
+	.hide {
+		display:none;
+	}
+	.width20p {
+		width:25%;
+	}
+	.middleright {
+		vertical-align:bottom; 
+		text-align:right;
+	}
+	</style>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+		<h2 align="center">
+			欢迎登录织望科技
+		</h2>
+           	<div id="error" class="hide alert alert-danger" align="center">
+               	无效的用户名和密码
+               </div>
+            <div id="info" class="hide center alert alert-info" align="center">
+ 				你已经退出系统
+            </div>
+		<form action="/auth/login" method="post" >
+		    <table id="detail" class="table">
+		      <tr>
+		        <td class="width20p">
+		        	<span class="middleright form-control">帐号: </span>
+		        </td>
+		        <td class="width80p" colspan="2">
+		        <input id="username" class="form-control" name="username" type="text" required autofocus />
+		        </td>
+		      </tr>
+		      <tr>
+		        <td class="width20p">
+		        	<span class="middleright form-control">密码: </span>
+		        </td>
+		        <td colspan="2">
+		        <input id="password" class="form-control" name="password" type="password" required />
+		        </td>
+		      </tr>
+		      <tr>
+		        <td />
+		        <td>
+			        <input id="signIn" class="form-control btn btn-success btn-sm" type="submit" value="登录" />
+		        </td>
+		        <td>
+			        <input id="signUp" class="form-control btn btn-primary btn-sm" onclick="toSignupPage();" type="button" value="注册" />
+		        </td>
+		      </tr>
+		    </table>
+	    </form>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

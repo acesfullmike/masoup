@@ -1,0 +1,224 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>查看文件</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script th:inline="javascript">
+		$(document).ready(function() {
+			showInfo();			
+			showDetail();
+		}); 
+		
+		function showInfo() {
+			var alert = [[${info}]];
+			if(alert != null) {
+				var div = $("<div></div>").attr("align", "center");
+				div.addClass("alert alert-info");
+				div.text(alert);
+				$("#alert").append(div);
+			}
+			
+			var alert = [[${error}]];
+			if(alert != null) {
+				var div = $("<div></div>").attr("align", "center");
+				div.addClass("alert alert-danger");
+				div.text(alert);
+				$("#alert").append(div);
+			}
+		}
+		
+		function showDetail() {
+			var content = [[${content}]];
+			if(content != null) {
+				$("#content").html(content);
+			} else {
+				$("#content").html("<不是文本文件，无法显示>");
+				$("#hasbadcode").addClass("hide");
+			}
+			
+			var filename = [[${title}]];
+			var href = [[${href}]];
+			htmlTitle(filename);
+			var mytitle = $("#myTitle").html(filename).addClass("underline");
+			mytitle.attr("href", href);
+			
+			var lines = [[${lines}]];
+			if(lines == null) {
+				$("#stats").remove();
+			}
+			
+			var issuper = [[${issuper}]];
+			if(!issuper) {
+				$("#myRemove").addClass("hide");
+			}
+			var isover100k = [[${isover100k}]];
+			var isimage = [[${isimage}]];
+			if(isimage) {
+				var path = href;
+				var image = $("<img></img>").attr("alt", "<图片文件，点击加载>");
+				image.attr("id", "myImage");
+				image.css("max-width", "100%");
+				image.click(function(){
+					var element = image[0];
+					image.attr("alt", "<图片正在加载...>");
+			        loadImage(element, path, showImage);
+				});
+				var needToSaveTraffic = isMobileAndNotWifi() && isover100k;
+				if(!needToSaveTraffic) {
+					image.click();
+				}
+				var anchor = $("<a></a>").append(image);
+				console.log(999, image.src);
+				anchor.attr("id", "myAnchor");
+				$("#showArea").prepend(anchor);
+				$("#content").remove();
+			} else {
+				$("#myBrave").remove();
+			}
+		}
+		
+		function hasbadcode() {
+			var param = "?switch";
+			var url = window.location.href;
+			if(url.indexOf(param) >= 0) {
+				url = url.replace(/\?switch/g, "");
+			} else {
+				url += param;
+			}
+			window.location.href = url;
+		}
+		
+		function backto() {
+			var url = "/file/list";
+			window.location.href = url;
+		}
+		
+		function download() {
+			var url = window.location.href;
+			var temp = url.replace("/view/", "/download/");
+			//alert(temp);
+			window.location.href = temp;
+		}
+		
+		function remove() {
+			var url = window.location.href;
+			var temp = url.replace("/view/", "/delete/");
+			//alert(temp);
+			window.location.href = temp;
+		}
+		
+		function nextone() {
+			var url = window.location.href;
+			var temp = url.replace("/view/", "/next/");
+			//alert(temp);
+			window.location.href = temp;
+		}
+		
+		function previous() {
+			var url = window.location.href;
+			var temp = url.replace("/view/", "/previous/");
+			window.location.href = temp;
+		}
+		
+		function loadImage(obj,url,callback) {
+            var img = new Image();
+            img.src = url;
+
+            // 判断图片是否在缓存中
+            if(img.complete){
+                callback.call(img,obj);
+                return;
+            }
+
+            // 图片加载到浏览器的缓存中回调函数
+            img.onload = function(){
+                callback.call(img,obj);
+            }
+        }
+		
+		function showImage(obj){
+            obj.src = this.src;
+            console.log(222, obj.src);
+            $(obj).parent().attr("href", obj.src);
+        }
+	</script>
+	<style type="text/css">
+	pre {
+		white-space: pre-wrap;
+		word-wrap: break-word;
+	}
+	.underline {
+		text-decoration:underline
+	}
+	</style>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+		<div class="margin10">
+		<div id="alert"></div>
+		<div>
+		<h2 id="top">查看文件&nbsp;<input class="btn btn-primary btn-sm" type="button" onclick="backto();" value="文件列表" /></h2>
+		<span></span>
+		</div>
+		<div>
+        	<span><input class="btn btn-default btn-sm" type="button" onclick="previous();" value="←" />&nbsp;</span>
+        	<span><input class="btn btn-primary btn-sm" type="button" onclick="nextone();" value="→" />&nbsp;</span>
+        	<span><input class="btn btn-success btn-sm" type="button" onclick="window.open('/file/up_input', '_self')" value="↑↑↑" />&nbsp;</span>
+        	<span><input class="btn btn-info btn-sm" type="button" onclick="download();" value="↓↓↓" />&nbsp;</span>
+        	<span id="hasbadcode" ><input class="btn btn-warning btn-sm" type="button" onclick="hasbadcode();" value="乱码" />&nbsp;</span>
+        	<span id="myRemove" ><input class="btn btn-danger btn-sm" type="button" onclick="remove();" value="Χ" /></span>
+	    </div>
+	    <table class="table table-hover">
+	    	<thead>
+	    		<tr>
+	    			<td>名称:&nbsp;<a id="myTitle"></td>
+	    		</tr>
+	    	</thead>
+	        <tbody id="list">
+				<tr>
+				  <td>
+				  	大小:&nbsp;<span th:if="${filesize != null}" th:text="${filesize}" />
+				  </td>
+				</tr>
+				<tr>
+				  <td>
+				  	创建于:&nbsp;<span th:if="${prettyCreation != null}" th:text="${prettyCreation}" />
+				  </td>
+				</tr>
+				<tr>
+				  <td>
+				  	创建了:&nbsp;<span th:if="${timeago != null}" th:text="${timeago}" />
+				  </td>
+				</tr>
+				<tr th:if="${duration != null}">
+				  <td>
+				  	时长:&nbsp;<span th:text="${duration}" />
+				  </td>
+				</tr>
+				<tr th:if="${pages != null}" >
+				  <td>
+				  	页数:&nbsp;<span th:text="${pages}" />
+				  </td>
+				</tr>
+				<tr id="stats">
+				  <td>
+				  	总计:&nbsp;共<span th:if="${lines != null}" th:text="${lines}" />行
+				  	&nbsp;&nbsp;<span th:if="${chars != null}" th:text="${chars}" />个字符
+				  </td>
+				</tr>
+				<tr>
+				  <td id="showArea">
+				  	<pre id="content">xxx</pre>
+				  	<br id="myBrave">
+				  	<a href="#top">回到顶部</a>
+				  </td>
+				</tr>
+	        </tbody>
+	    </table>
+	    </div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

@@ -1,0 +1,321 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>兴趣点列表</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script th:inline="javascript">
+	
+		var listId, listName, isPublic;
+	
+		$(document).ready(function() {
+			createBasic();
+			createList();
+		});
+		
+		var infoUsername = "100个字符以内，如：活在广州";
+
+		function createBasic() {
+			$("#listName").attr("placeholder", infoUsername);
+
+			listId = [[${listId}]];
+			if(listId) {
+				//edit
+				var info = "编辑兴趣点地图";
+				var action = "/poi/list/" + listId + "/update";
+				$("form").attr("action", action);
+				$("title").text(info);
+				$("#head2").text(info);
+				
+				var canModify = [[${canModify}]];
+				console.log(canModify, !canModify);
+				if(!canModify) {
+					console.log(1919);
+					$("#listName").attr("disabled","disabled");
+					$("#isPublic").attr("disabled","disabled");
+				}
+			}
+			
+			listName = [[${listName}]];
+			isPublic = [[${isPublic}]];
+			var userId = [[${creator}]];
+			if(userId != null) {
+				var creator = $("#creator").attr("href", "/user/" + userId + "/detail").text("user#" + userId);
+			}
+			console.log(121314, listName, isPublic, $("#creator").attr("href"));
+			
+			if(listName != null) {
+				$("#listName").val(listName);
+			}
+			
+			if(isPublic != null) {
+				$("#isPublic").attr("checked", isPublic);
+			}
+		}
+		
+		function check() {
+			var isChecked = $("#isPublic").prop("checked");
+			console.log(22, isChecked);
+			$("#isPublicX").val(isChecked);
+			var username = $("#listName").val().trim();
+			var len1 = username.length;
+			if(len1 == 0) {
+				$("#listName").val("").focus();
+				return false;
+			} else if(len1 > 100) {
+				alert(infoUsername);
+				$("#listName").focus();
+				return false;
+			}
+			
+			return true;
+		}
+		
+		function createList() {
+			var issuper = [[${issuper}]];
+			if(issuper) {
+				$("#myRemove").removeClass("hide");
+				$("#myBoxHead").removeClass("hide");
+			}
+
+			var listId = [[${listId}]];
+			var poiItems = [[${poiItems}]];
+			console.log(poiItems);
+			$("#count").text(poiItems.length);
+			$("#listName").text([[${listName}]]);
+			$("#headName").text([[${listName}]]);
+			for(var k = 0; k < poiItems.length; k++) {
+				var item = poiItems[k];
+				var itemid = item.id;
+				var toShow = item.toShow;
+				var name = item.name;
+				var address = item.address;
+				var category = item.category;
+				var location = item.location;
+				var creation = item.creation;
+				
+				var row = $("<tr></tr>");
+				row.attr("height", "17px");
+				row.attr("style", "height:17px");
+
+				var hrefEdit = "/poi/item/" + itemid + "/edit";
+
+				var anchor = $("<a>编</a>").attr("target", "_self");
+	    		anchor.attr("href", hrefEdit);
+	    		
+				var td = $("<td></td>").attr("width", "40px").append(anchor);
+				row.append(td);
+				
+				var myShowHide = $("<input></input>").attr("type", "checkbox");
+				console.log(12, toShow);
+				if(toShow) {
+					myShowHide.prop("checked", true);
+				}
+				myShowHide.change(function(){
+					var flag = $(this).prop('checked');
+					var itemid = $(this).data("itemid");
+					var name = $(this).data("name");
+					console.log(flag, itemid, name);
+					updateShowHide(itemid, flag);
+				});
+				myShowHide.attr("data-itemid", itemid);
+				myShowHide.attr("data-name", name);
+				var td = $("<td></td>").append(myShowHide);
+				row.append(td);
+
+				var hrefView = "/poi/list/" + listId + "/view?";
+				hrefView += "location="+location;
+				hrefView += "&address="+address;
+				hrefView += "&poiName="+name;
+				
+	    		anchor = $("<a>" + name + "</a>").attr("target", "_blank");
+	    		anchor.attr("href", hrefView);
+	    		
+	    		td = $("<td></td>").append(anchor);
+	    		td.addClass("auto");
+	    		row.append(td);
+	    		
+	    		var span = $("<span>" + category + "</span>");
+	    		span.css("vertical-align", "middle");
+	    		td = $("<td></td>").append(span);
+	    		row.append(td);
+	    		
+	    		span = $("<span>" + address + "</span>");
+	    		span.css("vertical-align", "middle");
+	    		td = $("<td></td>").append(span);
+	    		row.append(td);
+	    		
+	    		span = $("<span>" + location + "</span>");
+	    		span.css("vertical-align", "middle");
+	    		td = $("<td></td>").append(span);
+	    		row.append(td);
+	    		
+	    		span = $("<span>" + creation + "</span>");
+	    		span.css("vertical-align", "middle");
+	    		td = $("<td></td>").attr("width", "20%").attr("height", "17").append(span);
+	    		row.append(td);
+	    		
+	    		$("#list").append(row);
+			}
+		}
+		
+		function updateShowHide(itemid, toshow) {
+			var theball = {
+				url : "/poi/item/" + itemid + "/updateToshow/" + toshow,
+				type : "POST",
+				dataType : "json",
+				success: function(meat) {
+					var result = meat.flag;
+					console.log("response", meat);
+				}
+			}
+			console.log(theball);
+			$.ajax(theball);
+		}
+		
+		function spread() {
+			var val = $("#mySpread").prop("checked");
+			console.log(val);
+			$("#myGrid input:checkbox").each(function(){
+				$(this).prop("checked", val);
+			});
+		}
+		
+		function remove() {
+			var count = 0;
+			$("#myGrid input:checkbox:checked").each(function(){
+				count++;
+				var filename = $(this).data("filename");
+				var hidden = $("<input></input>").attr("type", "hidden");
+				hidden.attr("name", "xfilename");
+				hidden.val(filename);
+				$("#myForm").append(hidden);
+			});
+			
+			if(count > 0) {
+				$("#myForm").submit();
+			} else {
+				$("#mySpread").focus();
+			}
+			
+//			alert("删除选定的文件");
+		}
+		
+		//window.open('/file/up_input', '_self')
+		
+		function addItem() {
+			var listId = [[${listId}]];
+			var url = "/poi/list/" + listId + "/add";
+			window.location.href = url;
+		}
+		
+		function refresh() {
+			var url = window.location.href;
+			window.location.href = url;
+		}
+		
+		function showMap() {
+			var url = "/poi/list/" + listId + "/map";
+			window.location.href = url;
+		}
+		
+		function backto() {
+			var url = "/poi/lists";
+			window.location.href = url;
+		}
+		
+	</script>
+	<style type="text/css">
+	pre {
+		white-space: pre-wrap;
+		word-wrap: break-word;
+	}
+	.auto {
+		word-wrap:break-word;
+		word-break:break-all;
+	}
+	</style>
+</head>
+<body>
+	<div th:replace="header::bodyHead"></div>
+	
+	<div class="margin10">
+		<div id="result"></div>
+		<ul class="list-group">
+		<li class="font20 list-group-item active"><span id="headName">yyy</span> (<span id="count">xxx</span>个兴趣点)</li>
+	    </ul>
+	    
+   		<form id="myForm" action="/poi/deleteBatch" method="post">
+        	<span><input class="btn btn-primary btn-sm" type="button" onclick="refresh();" value="刷新" />&nbsp;</span>
+   	    	<span><input class="btn btn-success btn-sm" type="button" onclick="addItem()" value="+新增" />&nbsp;</span>
+        	<span><input class="btn btn-danger btn-sm" type="button" onclick="showMap();" value="地图" />&nbsp;</span>
+        	<input class="btn btn-primary btn-sm" type="button" onclick="backto();" value="地图集" />
+       	</form>
+   		<br>
+	    
+	    <ul id="myTab" class="nav nav-tabs">
+			<li class="active">
+				<a href="#home" data-toggle="tab">基本信息</a>
+			</li>
+			<li><a href="#itemsTab" data-toggle="tab">列表</a></li>
+		</ul>
+		<div id="myTabContent" class="tab-content">
+			<div class="tab-pane fade in active" id="home">
+				<form id="myForm" action="/poi/lists/addNew" method="post" onsubmit="return check();" >
+					<input id="isPublicX" type="hidden" name="isPublic">
+				    <table id="detail" class="table">
+				      <tr>
+				        <td class="width20p">
+				        	<span class="middleright form-control">名称: </span>
+				        </td>
+				        <td class="width80p" colspan="2">
+				        	<input id="listName" class="form-control" name="listName" type="text" required autofocus />
+				        </td>
+				      </tr>
+				      <tr>
+				        <td class="width20p">
+				        	<span class="middleright form-control">创建者: </span>
+				        </td>
+				        <td class="width80p" colspan="2">
+				        	<span class="form-control" name="creator" ><a id="creator"></a></span>
+				        </td>
+				      </tr>
+				      <tr>
+				        <td />
+				        <td width="38%">
+					        <input class="form-control btn btn-primary btn-sm" type="submit" value="保存" />
+				        </td>
+				        <td style="vertical-align:middle;color:green">
+				        	<input id="isPublic" checked type="checkBox">
+				        	<span>所有人可见</span>
+				        </td>
+				      </tr>
+				    </table>
+			    </form>
+			</div>
+			
+			<div class="tab-pane fade" id="itemsTab">
+			    <table id="myGrid" class="table table-hover">
+			    	<thead>
+			    		<tr>
+			    			<td width="40px"></td>
+			    			<td>显</td>
+			    			<td>名称</td>
+			    			<td>类别</td>
+			    			<td>地址</td>
+			    			<td>坐标</td>
+			    			<td>创建时间</td>
+			    		</tr>
+			    	</thead>
+			        <tbody id="list">
+			        </tbody>
+			    </table>
+		    </div>
+		</div>
+		
+	</div>
+	
+    <div th:replace="footer::copyright"></div>
+</body>
+</html>

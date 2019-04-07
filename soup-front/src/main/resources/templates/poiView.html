@@ -1,0 +1,104 @@
+﻿<!doctype html>
+<html>
+<head>
+    <title>织望-查看兴趣点</title>
+    <meta charset="utf-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    
+    <script src="/js/picker.js"></script>
+    <script src="/js/jquery/3.1.1/jquery.min.js"></script>
+    <script src="http://webapi.amap.com/maps?v=1.4.4&key=02a37b38c4b33a671f1cd1584b54adc8&plugin=AMap.Autocomplete"></script>
+    <script src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+
+	<script th:inline="javascript">
+		$(document).ready(function() {
+			showInfo();
+			pick();
+			
+			var location = [[${location}]];
+			var address = [[${address}]];
+			var sample = [[${sample}]];
+			
+			if(location != null) {
+				//locateTriggeredByValue(location);
+				$("#location").val(location);  
+				$("#address").val(address);  
+			}
+			
+			console.log(location, address, sample);
+	
+			if(sample != null) {
+				new AMap.Marker({
+		  			raiseOnDrag: true,
+		  			position: sample.split(","),
+		  			map: map
+				});
+			}
+		});
+		
+		function showInfo() {
+			var listId = [[${listId}]];
+			var poiName = [[${poiName}]];
+			var address = [[${address}]];
+			var location = [[${location}]];
+
+			if(poiName != null) {
+				$("#poiName").text(poiName);
+			}
+			if(address != null) {
+				$("#address").val(address);
+			}
+			if(location != null) {
+				$("#location").val(location);
+			}
+			
+			$("#mySubmit").addClass("hide");
+			
+			var url = "/poi/list/" + listId + "/add";
+			console.log(url, 1);
+			$("#myForm").attr("action", url);
+			var action = $("#myForm").attr("action");
+			console.log(action, 2);
+		}
+		
+		function save() {
+			alert($("#myForm").attr("action"));
+			//myForm.submit();
+		}
+    </script>
+    <style type="text/css">
+		.extend100 {
+			width:100%;
+		}
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<div id="myPageTop">	
+    <table width="280" cellpadding="10">
+        <tr>
+            <td width="100%" colspan="2">
+                <span style="width:100%" class="form-control" id="poiName"></span>
+            </td>
+        </tr>
+        <tr>
+            <td width="100%" colspan="2">
+                <input style="width:100%" required type="text" class="form-control" value="输入地址信息，自动提示" id="address" name="address">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input style="width:100%" required type="text" class="form-control" value="输入经纬坐标，如108,22" id="location", name="location">
+            </td>
+            <td>
+                <input style="width:100%" id="mySubmit" type="submit" class="btn btn-success btn-sm" value="保存">
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

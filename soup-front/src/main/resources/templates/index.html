@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>织望科技 - 编织希望，迎接未来</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script type="text/javascript" th:inline="javascript">
+		$(document).ready(function() {
+			createMenus();
+		});
+		
+		function createMenus() {
+			var menus = new Array();
+			var user = [[${session.user}]];
+			console.log(user, 10101);
+			if(user != null) {
+				//menus.push(["POI-地理兴趣点","/poi/lists"]);
+			}
+			menus.push(["圣经","/sirap/bible/books?en"]);
+			menus.push(["SIRAP云计算","/sirap/calc?ajax"]);
+			menus.push(["工具理性","/techs"]);
+			menus.push(["文件上传","/file/up_input"]);
+			menus.push(["文件列表","/file/list"]);
+			menus.push(["HTML实体","/sirap/htmlentity"]);
+			menus.push(["货币","/sirap/currency"]);
+			menus.push(["语言和国家","/sirap/locale"]);
+			menus.push(["兴趣点地图集","/poi/lists"]);
+			menus.push(["地址和经纬度","/sirap/picker"]);
+			menus.push(["几月份","/sirap/month"]);
+			menus.push(["星期几","/sirap/week"]);
+			menus.push(["相册","/albums"]);
+
+			var issuper = false;
+			if(user != null) {
+				if(user.username == "ninja") {
+					menus.push(["所有注册用户","/user/list"]);
+				}
+				menus.push(["秀圈","/xius"]);
+				menus.push(["图片集","/file/albums"]);
+				menus.push(["Map of population centers","/poi/items/world/map"]);
+				menus.push(["Wiki list of population centers","https://en.wikipedia.org/wiki/List_of_population_centers_by_latitude"]);
+				menus.push(["国土安全第七季 Wiki","https://en.wikipedia.org/wiki/Homeland_(season_7)"]);
+				menus.push(["国土安全第七季 下载","http://www.meijutt.com/content/meiju23287.html"]);
+				menus.push(["Github Mas项目源代码","https://github.com/acesfullmike/mas"]);
+				menus.push(["Github Mas运行文件","https://github.com/acesfullmike/masrun"]);
+				menus.push(["Github Mas帮助文档","https://raw.githubusercontent.com/acesfullmike/masrun/master/help.txt"]);
+				menus.push(["老覃公车","/sword/up_input"]);
+				menus.push(["实战演练","/pure"]);
+				menus.push(["安全控制","/helloRest/user"]);
+				menus.push(["使用状态","http://www.aka10.com:81/status.html"]);
+			}
+			menus.push(["南宁IT机构","http://www.aka10.com:81/firms.html"]);
+			
+			for(var i = 0; i < menus.length; i++) {
+        		var menu = menus[i];
+        		var isNew = i <= 3;
+            	insertItems(menu[1], menu[0], isNew);
+        	}
+		}
+		
+		function insertItems(href, name, isNew) {
+			var lines = [];
+			var newSection = isNew ? '<span class="badge">新</span>' : '';
+			lines.push('<a href="' + href + '" class="list-group-item">' + name + newSection + '</a>');
+		    var line = lines.join('');
+	
+			$(".list-group").append(line);
+		}
+	</script>
+	<style type="text/css">
+	.h100 {
+		height:400px;
+	}
+	.m40 {
+		margin: 10px;
+	}
+	.blue {
+		background: gray;
+		border: 3px;
+	}
+	
+	</style>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+	<div class="m40">
+		<ul class="list-group">
+	    </ul>
+	</div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>织望科技 - 车辆提取结果</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script type="text/javascript">
+		$(document).ready(function() {
+		});
+	</script>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+	
+	<div class="margin6">
+	    <table class="table">
+           <tr>
+               <td align="center"><input class="btn btn-success" type="button" onclick="window.open('/sword/up_input', '_self')" value="继续处理"/></td>
+           </tr>
+           <tr>
+               <td align="center"><span th:text="${msg}"></span></td>
+           </tr>
+	    </table>
+				
+	    <table class="table table-hover">
+	        <tbody th:remove="all-but-first">
+	            <tr th:each="filename : ${filenames}">
+	                <td align="center"><a target="_blank" th:href="@{'/file/load?filename='+${filename}}" th:text="${filename}"></a></td>
+	            </tr>
+	        </tbody>
+	    </table>
+	</div>
+	
+    <div th:replace="footer::copyright"></div>
+</body>
+</html>

@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>注册成功</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script th:inline="javascript">
+		$(document).ready(function() {
+			showInfo();
+		});
+		
+		var infoUsername = "帐号为1-30位，需包含字母或者汉字";
+		var infoPwd = "密码为1-30位，包含字母、数字和标点符号";
+		var confirm = "请再次确认密码";
+
+		function showInfo() {
+			$("#username").attr("placeholder", infoUsername);
+			$("#pwd").attr("placeholder", infoPwd);
+			$("#pwd2").attr("placeholder", confirm);
+
+			var username = [[${username}]];
+			if(username != null) {
+				$("#username").text(username);
+			}
+			
+			var email = [[${email}]];
+			if(email != null) {
+				$("#email").text(email);
+				$("#email").attr("href", "mailto:" + email);
+			}
+			
+			/***/
+			$("#pwd").val("abc1234");
+			$("#pwd2").val("abc1234");
+		}
+	</script>
+	<style type="text/css">
+	.h100 {
+		height:400px;
+	}
+	.m40 {
+		margin: 10px;
+	}
+	.blue {
+		border: 3px;
+	}
+	</style>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+		<div class="h100 m40 blue">
+		<table width="100%" height="100%">
+		<tr>
+			<td class="middlecenter">
+				<h2 align="center">
+					您已注册成功注册帐号：<font color="gree"><span id="username">xxx</span></font>
+				</h2>
+				<h2 align="center">
+					请前往您注册的邮箱激活：<font color="blue">
+					<a id="email">yyy</a></font>
+				</h2>
+			</td>
+		</tr>
+		</table>
+		</div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

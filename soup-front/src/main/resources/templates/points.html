@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>POI兴趣点</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script type="text/javascript" th:inline="javascript">
+		$(document).ready(function() {
+			createMenus();
+		});
+		
+		function createMenus() {
+			var menus = new Array();
+			menus.push(["SIRAP云计算","/sirap/calc?ajax"]);
+			menus.push(["地址和经纬度","/sirap/picker"]);
+			menus.push(["文件上传","/file/up_input"]);
+			menus.push(["文件列表","/file/list"]);
+
+			var user = [[${session.user}]];
+			console.log(user, 10101);
+			var issuper = false;
+			if(user != null) {
+				if(user.username == "ninja") {
+					menus.push(["注册用户","/userRest/all"]);
+				}
+				menus.push(["秀圈","/xius"]);
+				menus.push(["国土安全第七季 Wiki","https://en.wikipedia.org/wiki/Homeland_(season_7)"]);
+				menus.push(["国土安全第七季 下载","http://www.meijutt.com/content/meiju23287.html"]);
+				menus.push(["Github Mas项目源代码","https://github.com/acesfullmike/mas"]);
+				menus.push(["Github Mas运行文件","https://github.com/acesfullmike/masrun"]);
+				menus.push(["Github Mas帮助文档","https://raw.githubusercontent.com/acesfullmike/masrun/master/help.txt"]);
+			}
+			
+			for(var i = 0; i < menus.length; i++) {
+        		var menu = menus[i];
+        		var isNew = i <= 3;
+            	insertItems(menu[1], menu[0], isNew);
+        	}
+		}
+		
+		function insertItems(href, name, isNew) {
+			var lines = [];
+			var newSection = isNew ? '<span class="badge">新</span>' : '';
+			lines.push('<a href="' + href + '" class="list-group-item">' + name + newSection + '</a>');
+		    var line = lines.join('');
+	
+			$(".list-group").append(line);
+		}
+	</script>
+	<style type="text/css">
+	.h100 {
+		height:400px;
+	}
+	.m40 {
+		margin: 10px;
+	}
+	.blue {
+		background: gray;
+		border: 3px;
+	}
+	
+	</style>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+	<div class="m40">
+		<ul class="list-group">
+		<li class="font20 list-group-item active">我的兴趣点</li>
+	    </ul>
+	</div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

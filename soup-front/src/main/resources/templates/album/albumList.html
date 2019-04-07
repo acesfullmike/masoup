@@ -1,0 +1,100 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>相册列表</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script th:inline="javascript">
+		$(document).ready(function() {
+			init();
+			createList();
+		});
+		
+		var router = "/album";
+		var currentpage = 0;
+		var mystart = 1;
+		
+		var sitename = "罗";
+		function init() {
+			$("#navy").append(addAlbumListNavi(sitename));
+			htmlTitle(sitename + "相册列表");
+		}
+		
+		function createList() {
+			$("#myUpload").click(function(){
+				var href = "/album/create";
+				window.location.href = href;
+			});
+
+			
+			var issuper = [[${issuper}]];
+			if(issuper) {
+				$("#myRemove").removeClass("hide");
+				$("#myBoxHead").removeClass("hide");
+			}
+			
+			var albumItems = [[${albumItems}]];
+			if(albumItems == null) {
+				return;
+			}
+			$("#count").text(albumItems.length);
+			for(var k = 0; k < albumItems.length; k++) {
+				var item = albumItems[k];
+				var albumName = item.name;
+				var href = "/album/" + albumName + "/show";
+				
+				var row = $("<tr></tr>");
+				var atext = albumName + " (" + item.count + "张, " + item.size + ")";
+	    		var anchor = $("<a></a>").text(atext).attr("target", "_self").attr("href", href);
+	    		var order = $("<label>#" + (k + 1) + "</label>").addClass("label label-primary");
+	    		order.css("cursor", "pointer");
+	    		order.click(function(){
+	    			var href = $(this).parent().find("a").attr("href") + "?lol";
+	    			console.log(href);
+	    			window.location.href = href;
+	    		});
+	    		var td = $("<td></td>").attr("width", "88%").append(order).append("&nbsp;&nbsp;").append(anchor);
+				if(k % 2 == 0) {
+		    		row.css("background", "rgb(189,219,245)");
+				}
+	    		td.addClass("auto");
+	    		row.append(td);
+
+	    		
+	    		$("#list").append(row);
+			}
+		}
+	</script>
+	<style type="text/css">
+	pre {
+		white-space: pre-wrap;
+		word-wrap: break-word;
+	}
+	.auto {
+		word-wrap:break-word;
+		word-break:break-all;
+	}
+	</style>
+</head>
+<body>
+	<div th:replace="header::bodyHead"></div>
+	
+	<div class="margin10">
+		<div id="result"></div>
+		<h2 id="top">
+			<span id="navy"></span>
+		    <input id="myUpload" class="btn btn-success btn-sm" type="button" value="+相册" />
+			<input class="btn btn-primary btn-sm" type="button" onclick="refresh();" value="刷新" />
+		</h2>
+		
+	    <table id="myGrid" class="table table-hover">
+	        <tbody id="list">
+	        </tbody>
+	    </table>
+	    <a href="#top">回到顶部</a>
+	</div>
+	
+    <div th:replace="footer::copyright"></div>
+</body>
+</html>

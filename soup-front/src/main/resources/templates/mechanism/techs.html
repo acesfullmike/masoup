@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>工具理性</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script type="text/javascript" th:inline="javascript">
+		$(document).ready(function() {
+			createMenus();
+		});
+		
+		function createMenus() {
+			var menus = new Array();
+			var shen2016 = "https://mp.weixin.qq.com/s?__biz=MjM5ODYxMDA5OQ==&mid=2651959886&idx=1&sn=03e45a5014053607eff5e55ed2c660d7";
+			menus.push(["架构师之路16年精选50篇", shen2016]);
+			
+			var shen2017 = "https://mp.weixin.qq.com/s/CIPosICgva9haqstMDIHag";
+			menus.push(["架构师之路17年精选80篇", shen2017]);
+			
+			menus.push(["Springboot Actuator", "/xactuator"]);
+			
+			for(var i = 0; i < menus.length; i++) {
+        		var menu = menus[i];
+        		var isNew = i <= 3;
+            	insertItems(menu[1], menu[0], isNew);
+        	}
+		}
+		
+		function insertItems(href, name, isNew) {
+			var lines = [];
+			var newSection = isNew ? '<span class="badge">新</span>' : '';
+			lines.push('<a href="' + href + '" class="list-group-item">' + name + newSection + '</a>');
+		    var line = lines.join('');
+	
+			$(".list-group").append(line);
+		}
+	</script>
+	<style type="text/css">
+	.h100 {
+		height:400px;
+	}
+	.m40 {
+		margin: 10px;
+	}
+	.blue {
+		background: gray;
+		border: 3px;
+	}
+	
+	</style>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+	<div class="m40">
+		<ul class="list-group">
+		<li class="font20 list-group-item active">理性</li>
+	    </ul>
+	</div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

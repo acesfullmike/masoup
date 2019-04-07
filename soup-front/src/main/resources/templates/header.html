@@ -1,0 +1,139 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml"
+xmlns:th="http://www.thymeleaf.org">
+<body>
+	<header th:fragment="headPart">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    
+    <link rel="stylesheet" href="/jscss/bootstrap/3.3.7/bootstrap.min.css">
+	<script src="/js/jquery/2.1.1/jquery.min.js"></script>
+	<script src="/js/jquery/jquery.base64.js"></script>
+	<script src="/jscss/bootstrap/3.3.7/bootstrap.min.js"></script>
+    
+	<link rel='stylesheet prefetch' href='/css/commons.css'>	
+    <link rel='stylesheet prefetch' href='/css/zhi.css'>	
+	<script src="/js/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/js/fish-common.js"></script>
+<!-- 
+	<script src="/webjars/bootstrap/3.3.7-1/js/bootstrap.min.js"></script>
+    
+<script src="/jscss/bootstrap/3.3.5/bootstrap.min.js"></script>
+ -->	
+	</header>
+	
+	<header th:fragment="bodyHead">
+		<script src="/js/capture/capturewrapper.js"></script>
+		<script src="/js/capture/jquery.json-2.3.min.js"></script>
+		<script src="/js/capture/niuniucapture.js"></script>
+		<script src="/js/capture/push.js"></script>
+		<script src="/js/capture/entry.js"></script>
+		<script th:inline="javascript">
+		$(document).ready(function() {
+			initCapture();
+			showUserOrLogin();
+		});
+		
+		function showUserOrLogin() {
+			var user = [[${session.user}]];
+			console.log(user, 171);
+			if(user != null) {
+				var username = user.username;
+				$("#login").css("display", "none");
+				$("#linkUser").text(username);
+				$("#linkUser").attr("href", "/user/" + user.id + "/detail");
+				var capital = username.substring(0,2);
+				$("#capital").text(capital);
+				var issuper = username == "ninja";
+				if(issuper) {
+					$("#super").removeClass("hide");
+				} else {
+					$("#nosuper").removeClass("hide");
+				}
+			} else {
+				$("#who").addClass("hide");
+				$("#logout").addClass("hide");
+			}
+		}
+		
+		function process(what) {
+			var myform = $("#myform");
+			myform.attr("action", what);
+			myform.submit();
+			console.log(myform);
+		}
+	
+		function initCapture() {
+			$(document.body).mousedown(function(){
+				checkCtrl(event);
+			});
+			var isWindows = /windows|win32/i.test(navigator.userAgent);
+			if(isWindows) {
+				$("#capture").attr("title", "点击此处截取当前屏幕，同时按住Ctrl将隐藏当前窗口");
+				$("#capture").click(function(){
+		    		StartCapture();
+		    	});
+			} else {
+				$("#capture").css("display","none");
+			}
+		}
+		
+		function toLogin() {
+			var href = window.location.href;
+			var pathname = window.location.pathname;
+			var tologin = "/login";
+			if(pathname != tologin) {
+				tologin += "?comefrom=" + href;
+			} else {
+				tologin = href;
+			}
+			window.location.href = tologin;
+		}
+		</script>
+		<style type="text/css">
+			.top {
+				height:70;
+				background:#424860;
+			}
+			.menus td {
+				padding:5px;
+			}
+			.hide {
+				display:none;
+			}
+			.edit {
+				color:blue
+			}
+			.remove {
+				color:rgb(200,20,20)
+			}
+			.middleright {
+				vertical-align:middle; 
+				text-align:right;
+			}
+			.niceTD {
+				word-wrap:break-word
+			}
+    	</style>
+    	<table id="top" class="top">
+    	<form id="myform" action="xxx" method="post">
+    		<tr>
+    			<td height="70px">
+    				<img height="70px" style="cursor:pointer"  src="/assets/zw-logo-text.jpg" onclick="window.open('/', '_self');" />
+				</td>
+				<td width="100%" align="right">
+					<table id="menus" border="0">
+						<tr class="menus">
+							<td id="who"><a class="blueHover whiteFront" id="linkUser" href="##">xxx</a></td>
+							<td><a class="blueHover whiteFront" href="/product">产品</a></td>
+							<td id="login"><a class="blueHover whiteFront" href="javascript:toLogin();">登录</a></td>
+							<td id="logout"><a a class="blueHover whiteFront" href="javascript:process('/auth/logout');">退出</a></td>
+							<td><img id="capture" class="cursor-cross" title="xxxx" src="/assets/capture.png" /></td>
+						</tr>
+					</table>
+				</td>
+    		</tr>
+    	</form>
+    	</table>
+    	</div>
+	</header>
+</body>
+</html>

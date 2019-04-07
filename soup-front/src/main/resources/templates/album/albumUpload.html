@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>相册照片上传</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			var cates = [[${albumItems}]];
+			console.log(cates);
+			initCategorySelect();
+		});
+		
+		function checkForm() {
+			var files =  $("#files").val();
+			console.log(files);
+			if(!files) {
+				alert("请选择要上传的照片");
+				return false;
+			}
+			return true;
+		}
+		
+		function initCategorySelect(cates) {
+			var mySelect = $("#myCates");
+			mySelect.empty();
+			if(cates == null) {
+				return;
+			}
+			
+			for (var i = 0; i < cates.length; i += 1) {
+				var item = cates[i];
+				var myOption = $("<option></option>").val(item);
+				mySelect.append(myOption);
+			}
+		}
+	</script>
+	<style type="text/css">
+   	</style>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+
+	<div class="margin6" align="center">
+		<form action="/file/upload" method="post" onsubmit="return checkForm();" enctype="multipart/form-data">
+			<table class="table">
+           		<tr><td align="center" colspan="2">
+		    		<input name="files" id="files" type="file" multiple="multiple" />
+               	</td></tr>
+               	
+               	        <tr>
+            <td width="100%">
+            	<!-- 
+            	<input required style="width:100%" type="text" class="form-control" placeholder="类别，如: 住处" id="category">
+            	 -->
+            	<input required list="myCates" style="width:100%" type="text" class="form-control" placeholder="类别，如: 住处" id="category">
+				<datalist id="myCates" />
+            	<input onClick="cleanCategory();" type="button" class="btn btn-info btn-sm" style="width:50px" value="清除">
+            </td>
+        </tr>
+               	
+               	
+           		<tr><td align="right" width="50%">
+		    		<input class="btn btn-success btn-sm" type="submit" value="↑上传"/>
+               	</td>
+           		<td align="left">
+		    		<input class="btn btn-primary btn-sm" type="button" onclick="window.open('/file/albums', '_self')" value="相册列表"/>
+               	</td></tr>
+	   	 	</table>
+	    </form>
+	</div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

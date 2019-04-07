@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>注册</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script th:inline="javascript">
+		$(document).ready(function() {
+			showInfo();
+			showHide();								
+		});
+		
+		var infoUsername = "帐号为1-30位，需包含字母或者汉字";
+		var infoPwd = "密码为1-30位，包含字母、数字和标点符号";
+		var confirm = "请再次确认密码";
+
+		function showInfo() {
+			$("#username").attr("placeholder", infoUsername);
+			$("#pwd").attr("placeholder", infoPwd);
+			$("#pwd2").attr("placeholder", confirm);
+
+			var username = [[${username}]];
+			if(username != null) {
+				$("#username").val(username);
+			}
+			
+			/***/
+			$("#pwd").val("abc1234");
+			$("#pwd2").val("abc1234");
+		}
+		
+		function showHide() {
+			var infop = [[${param.info}]];
+			var info = [[${info}]];
+			if(infop != null || info != null) {
+				$("#info").removeClass("hide");
+				$("#info").text(info);
+			}
+			var errorp = [[${param.error}]];
+			var error = [[${error}]];
+			if(errorp != null || error != null) {
+				$("#error").removeClass("hide");
+			}
+		}
+		
+		function check() {
+			var username = $("#username").val().trim();
+			var len1 = username.length;
+			if(len1 == 0) {
+				$("#username").val("").focus();
+				return false;
+			} else if(len1 > 30) {
+				alert(infoUsername);
+				$("#username").focus();
+				return false;
+			}
+			
+			var pwd = $("#pwd").val().trim();
+			var len2 = pwd.length;
+			if(len2 == 0) {
+				$("#pwd").val("").focus();
+				return false;
+			} else if(len2 > 30) {
+				alert(infoPwd);
+				$("#pwd").focus();
+				return false;
+			}
+			
+			var pwd2 = $("#pwd2").val().trim();
+			if(pwd2.length == 0) {
+				$("#pwd2").val("").focus();
+				return false;
+			}
+			
+			if(pwd != pwd2) {
+				alert("两次输入的密码不一致，请重新输入");
+				$("#pwd").focus();
+				return false;
+			}
+			
+			return true;
+		}
+	</script>
+	<style type="text/css">
+	.hide {
+		display:none;
+	}
+	.sign {
+		width:200px;
+	}
+	.width20p {
+		width:25%;
+	}
+	.middleright {
+		vertical-align:middle; 
+		text-align:right;
+	}
+	</style>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+		<h2 align="center">
+			欢迎注册帐号
+		</h2>
+       	<div id="error" class="hide alert alert-danger" align="center">
+           	无效的用户名和密码
+		</div>
+        <div id="info" class="hide center alert alert-info" align="center">
+			你已经退出系统
+        </div>
+		<form action="/user/signup" method="post" onsubmit="return check();" >
+		    <table id="detail" class="table">
+		      <tr>
+		        <td class="width20p">
+		        	<span class="middleright form-control">帐号: </span>
+		        </td>
+		        <td class="width80p" colspan="2">
+		        <input id="username" class="form-control" name="username" type="text" required autofocus />
+		        </td>
+		      </tr>
+		      <tr>
+		        <td class="width20p">
+		        	<span class="middleright form-control">密码: </span>
+		        </td>
+		        <td colspan="2">
+		        <input id="pwd" class="form-control" name="password" type="password" required />
+		        </td>
+		      </tr>
+		      <tr>
+		        <td class="width20p">
+		        	<span class="middleright form-control">确认: </span>
+		        </td>
+		        <td colspan="2">
+		        <input id="pwd2" class="form-control" name="pwd2" type="password" required />
+		        </td>
+		      </tr>
+		      </tr>
+		      <tr>
+		        <td />
+		        <td width="38%">
+			        <input id="signUp" class="form-control btn btn-primary btn-sm" type="submit" value="同意条款并注册" />
+		        </td>
+		        <td style="vertical-align:middle;color:green">
+		        	<input checked id="agree" type="checkBox" required>
+		        	<a href="#">织望科技网站条款</a> | <a href="#">法律声明和隐私权政策</a>
+		        </td>
+		      </tr>
+		    </table>
+	    </form>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

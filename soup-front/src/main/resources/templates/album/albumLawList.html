@@ -1,0 +1,217 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>相册列表</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script th:inline="javascript">
+
+		$(document).ready(function() {
+			init();
+			xmore();
+			initSearch();
+		});
+		
+		var router = "/albumlaw";
+		var sitename = "Law";
+		var currentpage = 0;
+		var mystart = 1;
+		function init() {
+			var origin = [[${param.w}]];
+			$("#criteria").val(origin);
+			$("#criteria").focus().attr("placeholder", "可输入关键字查询");
+			$("#navy").append(addAlbumListNavi(sitename));
+			
+			var paramStartpage = [[${param.sp}]];
+			if(paramStartpage) {
+				mystart = paramStartpage;
+			}
+			currentpage = mystart - 1;
+			$("#major").css("table-layout", "fixed");
+			htmlTitle(sitename + "相册列表");
+		}
+		
+		var mycry;
+		var toSearchTimer;
+		function initSearch() {
+			$("#criteria").bind("input", function(){
+				if(toSearchTimer) {
+					clearTimeout(toSearchTimer);
+				}
+				toSearchTimer = setTimeout(function(){
+					mycry = $.trim($("#criteria").val());
+					window.location.href = router + "/list?w=" + mycry;
+				}, 2000);
+			});
+		}
+		
+		var texta = "点击加载更多相册";
+		var textb = "正在加载...";
+		function xmore() {
+			$("#xmore").val(textb);
+			$("#xmore").attr("disabled", true);
+			currentpage++;
+			console.log("xmore", currentpage);
+			getImagesByPage(currentpage);
+		}
+		
+		var mytotal = "0";
+		function getImagesByPage(page) {
+			var weburl = router + "/page/" + page;
+			var param = $.trim($("#criteria").val());
+			if(param && param.length != 0) {
+				weburl += "?w=" + encodeURI(param);
+			}
+			
+			console.log(weburl);
+			var theball = {
+					url : weburl,
+					dataType : "json",
+					success: function(meat) {
+						console.log("At " + page);
+						var photos = meat.photos;
+						var temp = meat.totalpage;
+						if(temp) {
+							mytotal = temp;
+						}
+						var texta = "共" + mytotal + "页，当前第" + page + "页，";
+						console.log("lawlist", photos.length == 0);
+						if(photos.length != 0) {
+							insertTable(meat);
+							updateOrderNumber();
+							var hasmore = page < mytotal;
+							if(hasmore) {
+								var more = "点击加载下页...";
+								$("#xmore").val(texta + more);
+								$("#xmore").attr("disabled", false);
+							} else {
+								var more = "没有更多了。";
+								$("#xmore").val(texta + more);
+							}
+						} else {
+							var texta = "共" + mytotal + "页，当前" + page + "页没有数据。";
+							$("#xmore").val(texta);
+						}
+			        }
+			}
+			$.ajax(theball);
+		}
+		
+		function updateOrderNumber() {
+			var mycount = $(".mylabor").length;
+			$(".mylabor").each(function(index, element) {
+				var outorder = index + 1;
+				$(this).text("#" + outorder + " / " + mycount);
+			});
+			$("#count").text(mycount);
+		}
+		
+		function insertTable(meat) {
+			var albums = meat.photos;
+			for(var myi = 0; myi < albums.length; myi++) {
+				var item = albums[myi];
+				var title = item.title;
+				var albumurl = "/album/" + title + "/show";
+				
+				var cover = item.cover;
+				var when = item.when;
+				var count = item.count;
+				
+				var td = tdOfBreakword();
+				
+				var labor = labelOf("#").addClass("mylabor label-primary")
+				td.append(labor);
+				td.append(knbsp(2));
+				
+				var labelCount = labelOf(count + "张").addClass("label-info");
+				td.append(labelCount);
+				td.append(knbsp(2));
+				
+				var d1 = when.split(" ")[0];
+				var labelWhen = labelOf(d1).addClass("label-success");
+				td.append(labelWhen);
+				td.append(knbsp(2));
+				
+				var ak = anchorOf(title, albumurl);
+				td.append(ak);
+				
+				console.log(999, cover);
+				if(cover) {
+					var coverurl = "/storage/albums/" + title + "/" + cover;
+					console.log(cover, coverurl);
+					
+					var image = $("<img></img>").attr("alt", "<点击加载封面>");
+					image.addClass("dog").css("max-width", "100%");
+					image.attr("data-mypath", coverurl);
+					image.attr("data-albumurl", albumurl);
+					image.click(function() {
+						var current = $(this);
+
+						var status = current.attr("status");
+						if(status != null) {
+							var albumurl = current.data("albumurl");
+							var href = albumurl;
+							window.open(href, "_blank");
+						} else {
+							var status = current.attr("status");
+							current.attr("alt", "<正在加载封面...>");
+							var myPath = current.data("mypath");
+					        loadImage(this, myPath, showImage);
+					        current.attr("status", "full");
+					        current.css("cursor", "pointer");
+						}
+					});
+					image.click();
+					td.append("<br>").append(image);
+				}
+				
+				var tr = $("<tr></tr>").append(td);
+				$("#list").append(tr);
+
+				//donation area
+				if(myi == albums.length - 1) {
+					$("#list").append(trOfDonation());
+				}
+				//donation area
+			}
+		}
+	</script>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+		<div class="margin10">
+		<div>
+		<h2 id="top">
+			<span id="navy"></span>
+			<input class="btn btn-primary btn-sm" type="button" onclick="refresh();" value="刷新" />
+		</h2>
+		</div>
+		
+	    <table id="major" class="table table-hover">
+	    	<tr>
+			  <td>
+			  	<a href="#bottom" style="font-style:italic">去到底部</a>
+			  	&nbsp;
+			  	<input id="criteria" type="text" class="form-control input-sm" style="width:180px;display:inline">
+			  	&nbsp;
+			  </td>
+			</tr>
+	        <tbody id="list">
+	        </tbody>
+	        <tbody id="more">
+		        <tr>
+				  <td>
+				  	<input id="xmore" style="width:100%" class="btn btn-success btn-sm" type="button" onclick="xmore();" value="加载更多..." />
+				  </td>
+				</tr>
+		        <tr id="bottom">
+				  <td><a href="#top" style="font-style:italic">回到顶部</a></td>
+				</tr>
+	        </tbody>
+	    </table>
+	    </div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

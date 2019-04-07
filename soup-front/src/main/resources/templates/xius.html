@@ -1,0 +1,54 @@
+
+<!-- 最后更新 10:58:59 PM, Tuesday, Feb 27, 2018 GMT+8 -->
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <title>南宁秀圈</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+    <link rel="stylesheet" href="http://webapi.amap.com/ui/1.0/ui/misc/MarkerList/examples/index.css">
+    <script src='http://webapi.amap.com/maps?v=1.4.3&key=02a37b38c4b33a671f1cd1584b54adc8'></script>
+    <script src="http://webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+
+    <script src="/js/shrink.js"></script>
+    <script src="/js/capture/capturewrapper.js"></script>
+	<script src="/js/capture/jquery.json-2.3.min.js"></script>
+	<script src="/js/capture/niuniucapture.js"></script>
+	<script src="/js/capture/push.js"></script>
+	<script src="/js/capture/entry.js"></script>
+    
+    <style type="text/css">
+				#btnList li {text-align:right;}
+				audio{
+					width:100%;
+				}
+		</style>
+
+		<script type="text/javascript">
+				var xitems = null;
+				$(document).ready(function(){
+					fish();
+					$.getJSON(  
+			                "http://localhost/fish/all",  
+			                function (data) { 
+			                	console.log(data);
+			                	xitems = data; 
+			                }  
+			            );  
+				});
+    </script>
+</head>
+
+<body>
+    <div id="outer-box">
+        <div id="container" tabindex="0"></div>
+        <div id="panel" class="scrollbar1">
+            <ul id="myList" />
+        </div>
+        <ul id="btnList" />
+    </div>
+</body>
+
+</html>

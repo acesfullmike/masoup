@@ -1,0 +1,194 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>织望科技 - SIRAP云计算</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script th:inline="javascript">
+		$(document).ready(function() {
+			var result = [[${result}]];
+		    $("#ball").val(result);
+		    createButtons();
+		    init();
+		}); 
+		
+		function init() {
+			var command = [[${exp}]];
+			if(!isNOE(command)) {
+				htmlTitle(command.trim());
+			}
+		}
+		
+		var lastLeadword;
+		
+		function clearInput() {
+			var command = $("#exp").val();
+			var flag = command.startsWith(lastLeadword);
+			if(flag) {
+				var temp = command.replace(lastLeadword, "");
+				$("#exp").val(temp);
+			} else {
+				$("#exp").val("");
+			}
+			$("#exp").focus();
+		}
+		
+		function copyResult() {
+			$("#ball").select();
+			document.execCommand("Copy");
+		}
+		
+		function oneword(keyword) {
+			$("#exp").val(keyword);
+			doAjax();
+		}
+		
+		function doAjax() {
+			var command = $("#exp").val().trim();
+			if(command.length == 0) {
+				flash();
+				return;
+			}
+			htmlTitle(command);
+			var webData = {exp : command};
+			$("#ball").attr("disabled", true);
+			var theball = {
+				url : "/sos/calc/" + command,
+				dataType : "json",
+				data : webData,
+				success: function(meat) {
+					$("#exp").val(meat.exp);
+					$("#myRandom").val(meat.random);
+					$("#ball").attr("disabled", false);
+					$("#ball").val(meat.result);
+		        }
+			}
+			if($("#boxAjax").get(0).checked) {
+				$.ajax(theball);
+			} else {
+				$("#useAjax").val("false");
+				$("form").removeAttr("onsubmit");
+				$("form").submit();
+			}
+		}
+		
+		function random() {
+			var lowerValue = 3, upperValue = 13;
+		    var val = Math.floor(Math.random() * (upperValue - lowerValue + 1) + lowerValue);
+		    oneword("name" + val);
+		}
+		
+		function perform(keyword) {
+			var leadword = keyword;
+			lastLeadword = leadword;
+			var origin = $("#exp").val().trim();
+			if(origin.length == 0) {
+				flash();
+				$("#exp").val(leadword);
+			} else {
+				if(!origin.startsWith(leadword)) {
+					$("#exp").val(leadword + origin);
+				}
+				doAjax();
+			}
+		}
+		
+		function onFormKeyDown() {
+			if(event.keyCode==13) {
+				doAjax();
+			}
+		}
+		
+		function doCalc() {
+			doAjax();
+		}
+		
+		function flash() {
+			$("#exp").focus();
+		}
+		
+		function createButtons() {
+			var randomName = [[${random}]];
+			var buttonWidthPixel = [[${buttonWidth}]];
+			var actions = new Array();
+			actions.push(["success","doCalc()","计算"]);
+			actions.push(["default","clearInput()","↑清空"]);
+			actions.push(["success","perform('ga ')","抓图"]);
+			actions.push(["info","perform('=')","Head"]);
+			actions.push(["primary","perform('geo ')","经纬"]);
+			actions.push(["primary","perform('gas ')","周边"]);
+			actions.push(["primary","perform('bk ')","百科"]);
+			actions.push(["info","perform('i ')","查词"]);
+			actions.push(["info","perform('md5 ')","MD5"]);
+//			actions.push(["success","oneword('demo')","例子"]);
+			actions.push(["info","perform('l.')","长度"]);
+			actions.push(["danger","oneword('verse')","圣经"]);
+			actions.push(["success","perform('?')","帮助"]);
+			actions.push(["warning","random()", randomName]);
+			actions.push(["default","copyResult()","↓复制"]);
+			
+			for(var k = 0; k < actions.length; k++) {
+				var item = actions[k];
+	    		var element = $("<input></input>").attr("class", "btn btn-" + item[0] + " btn-sm").attr("value", item[2]);
+	    		element.css("align", "center");
+	    		element.css("width", buttonWidthPixel + "px");
+	    		element.attr("onclick", item[1]);
+	    		element.attr("type", "button")
+	    		element.attr("name", item[2]);
+	    		
+		    	if(k == 0) {
+		    		element.attr("id", "myCalc");
+		    	} else {
+		    		$("#buttons").append("&nbsp;");
+		    	}
+	    		if(item[1] == "random()") {
+	    			element.attr("id", "myRandom");
+	    		}
+	    		$("#buttons").append(element);
+		    }
+		    var boxWidth = 23;
+		    var boxAjax = $("<input></input>").css("width", (boxWidth) + "px");
+		    boxAjax.attr("type", "checkbox");
+		    boxAjax.attr("id", "boxAjax");
+		    
+		    var ajaxInfo = [[${ajax}]];
+		    ajaxInfo = "fake";
+		    console.log(ajaxInfo);
+		    if(ajaxInfo != null) {
+		    	boxAjax.attr("checked", true);
+		    }
+		    var labelAjax = $("<span></span>").text("Ajax").css("width", (buttonWidthPixel - boxWidth) + "px");
+		    boxAjax.css("vertical-align", "middle");
+		    labelAjax.css("vertical-align", "middle");
+		    $("#buttons").append(boxAjax).append(labelAjax).append("&nbsp;");
+		}
+	</script>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+
+	<div class="margin6">
+		<form action="/sirap/calc" method="get" onsubmit="return false;" onkeydown="onFormKeyDown()">
+		    <table id="detail" class="table table-hover table-bordered results">
+		      <tr id="inputs">
+		        <td><input required id="exp" name="exp" th:value="${exp}" class="area form-control" type="text" autofocus /></td>
+		      </tr>
+		      <tr>
+		        <td id="buttons">
+		        </td>
+		      </tr>
+		      <tr>
+				<td><textarea id="ball" class="area form-control" rows="12"></textarea>
+		      </tr>
+		      <tbody>
+		      </tbody>
+		    </table>
+	    </form>
+		    
+	</div>
+		
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

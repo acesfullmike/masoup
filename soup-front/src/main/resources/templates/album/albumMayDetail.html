@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>查看相册</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+    <div th:include="album/albumHeader::detailJS"></div>
+	<script th:inline="javascript">
+		$(document).ready(function() {
+			init();
+			showDetail();
+		});
+
+		var router = "/albummay";
+		var sitename = "雨";
+		
+		function showDetail() {
+			var imageItems = [[${list}]];
+			var count = imageItems.length;
+			var albumName = [[${title}]];
+			var when = [[${when}]];
+			var timeago = [[${timeago}]];
+			var niceurl = [[${niceurl}]];
+			console.log(9891, niceurl);
+			
+			htmlTitle(sitename + "相册" + albumName);
+
+			var a2 = anchorOf(albumName, niceurl);
+			$("#tdName").append(labelOf(count).addClass("label-primary")).append(knbsp(1)).append(a2);
+			$("#tdWhen").parent().hide();
+			$("#tdTimeago").parent().hide();
+			
+			for(var index = 1; index <= imageItems.length; index++) {
+				var item = imageItems[index - 1];
+				var path = item;
+				var imageName = albumName;
+				
+				var td = tdOfBreakword();
+				var inorder = "$" + index + " / " + imageItems.length;
+				td.append(labelOf(inorder).addClass("label-primary"));
+				td.append(knbsp(2));
+				td.append(imageName);
+				
+				var image = $("<img></img>").attr("alt", "<大图片文件，点击加载>");
+				image.addClass("dog");
+				image.attr("id", imageName);
+				image.attr("data-mypath", path);
+				image.css("max-width", "100%");
+				image.click(function() {
+					var current = $(this);
+					current.attr("alt", "<图片正在加载...>");
+					var myPath = current.data("mypath");
+			        loadImage(this, myPath, showImage);
+			        current.attr("status", "full");
+				});
+				
+				if(true) {
+					image.click();
+				}
+				
+				td.append("<br>").append($("<a></a>").append(image));
+				var tr = $("<tr></tr>").append(td);
+				$("#list").append(tr);
+
+				//donation area
+				var kdonation = [[${kdonation}]];
+				if(!kdonation) {
+					kdonation = 20;
+				}
+				var base = imageItems.length % kdonation;
+				var offset = index % kdonation;
+//				console.log(base, offset, index);
+				if(base == offset) {
+					$("#list").append(trOfDonation());
+				}
+				//donation area
+			}
+		}
+	</script>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+		<div class="margin10">
+			<div th:include="album/albumHeader::detailHolder"></div>
+	    </div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

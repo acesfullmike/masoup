@@ -1,0 +1,12 @@
+server:
+  port: 91
+
+spring:
+  application:
+    name: soup-album
+
+eureka:
+  instance:    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:80/eureka

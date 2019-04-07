@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>相册</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script type="text/javascript" th:inline="javascript">
+		$(document).ready(function() {
+			createMenus();
+		});
+		
+		function createMenus() {
+			var menus = new Array();
+			menus.push(["LAW","/albumlaw/list"]);
+			menus.push(["网易新闻","/album163news/list"]);
+			menus.push(["网易看客","/album163kan/list"]);
+			menus.push(["网易体育","/album163sports/list"]);
+			menus.push(["新浪体育","/albumsinasports/list"]);
+			menus.push(["新浪故事","/albumsinastory/list"]);
+			menus.push(["在人间","/albumzai/list"]);
+			menus.push(["风","/albumfen/list"]);
+			menus.push(["雨","/albummay/list"]);
+			menus.push(["雪","/albumcat/list"]);
+			menus.push(["雨全","/albummay/words"]);
+			menus.push(["罗","/album/list"]);
+			
+			for(var i = 0; i < menus.length; i++) {
+        		var menu = menus[i];
+        		var isNew = i <= 3;
+            	insertItems(menu[1], menu[0], isNew);
+        	}
+		}
+		
+		function insertItems(href, name, isNew) {
+			var lines = [];
+			var newSection = isNew ? '<span class="badge">新</span>' : '';
+			lines.push('<a href="' + href + '" class="list-group-item">' + name + newSection + '</a>');
+		    var line = lines.join('');
+	
+			$(".list-group").append(line);
+		}
+	</script>
+	<style type="text/css">
+	.h100 {
+		height:400px;
+	}
+	.m40 {
+		margin: 10px;
+	}
+	.blue {
+		background: gray;
+		border: 3px;
+	}
+	
+	</style>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+	<div class="m40">
+		<ul class="list-group">
+		<li class="font20 list-group-item active">相册</li>
+	    </ul>
+	</div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

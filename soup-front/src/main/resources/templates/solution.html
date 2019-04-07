@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>织望科技 - 解决方案</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script type="text/javascript">
+		$(document).ready(function() {
+													
+		}); 
+	</script>
+	<style type="text/css">
+	.h100 {
+		height:400px;
+	}
+	.m40 {
+		margin: 10px;
+	}
+	.blue {
+		background: gray;
+		border: 3px;
+	}
+	
+	</style>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+	<div class="m40">
+<div>
+	<ul class="list-group">
+	    <li class="font20 list-group-item active">解决方案</li>
+	<a href="#" class="list-group-item">云计算</a>
+	<a href="#" class="list-group-item">人工智能</a>
+	<a href="#" class="list-group-item">数据处理</a>
+	<a href="#" class="list-group-item">数据获取</a>
+	<a href="#" class="list-group-item">个人定制<span class="badge">新</span></a>
+	<a href="#" class="list-group-item">24*7 支持</a>
+	<a href="#" class="list-group-item">免费 Windows 空间托管</a>
+	<a href="#" class="list-group-item">图像的数量</a>
+	<a href="#" class="list-group-item">每年更新成本</a>
+    </ul>
+</div>
+	</div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

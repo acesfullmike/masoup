@@ -1,0 +1,169 @@
+﻿<!doctype html>
+<html>
+<head>
+    <title>地图坐标拾取</title>
+    <meta charset="utf-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    
+    <script src="/js/picker.js"></script>
+    <script src="/js/fish-common.js"></script>
+    <script src="/js/jquery/3.1.1/jquery.min.js"></script>
+    <script src="http://webapi.amap.com/maps?v=1.4.4&key=02a37b38c4b33a671f1cd1584b54adc8&plugin=AMap.Autocomplete"></script>
+    <script src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+
+	<script th:inline="javascript">
+		$(document).ready(function(){
+			zoomDefault = [[${zoom}]];
+			init();
+			initLocationsSelect([[${locs}]]);
+			pick(zoomDefault);
+			
+			var location = [[${location}]];
+			var address = [[${address}]];
+			var sample = [[${sample}]];
+			
+			$("#location").val("");  
+			$("#address").val("");
+			if(isNOE(location)) {
+				findAddressOfMarker();
+			} else {
+				$("#location").val(location.trim());
+				setLocation(location.trim());
+			}
+			
+			if(!isNOE(address)) {
+				$("#address").val(address.trim());  
+				$(document).attr("title", address.trim());
+			}
+
+			$("#address")[0].focus();
+//			console.log(location, address, sample);
+			
+			if(sample != null) {
+				new AMap.Marker({
+		  			raiseOnDrag: true,
+		  			position: sample.split(","),
+		  			map: map
+				});
+			}
+		});
+		
+		function init() {
+			var method = document.execCommand;
+//			method = isFromMobile;
+			var ok = typeof(method) == "function";
+			$("#checkAddress").click(function(){
+				console.log();
+				var flag = $(this).prop("checked");
+				$("#address").attr("readonly", !flag);
+			});
+			$("#checkLocation").click(function(){
+				console.log();
+				var flag = $(this).prop("checked");
+				$("#location").attr("readonly", !flag);
+			});
+			var flag = isWindows();
+			if(flag) {
+				$("#checkAddress").prop("checked", true);
+				$("#checkLocation").prop("checked", true);
+			} else {
+				$("#checkAddress").prop("checked", true);
+				$("#address").attr("readonly", false);
+				$("#checkLocation").prop("checked", false);
+				$("#location").attr("readonly", true);
+			}
+			flag = isFromIOS();
+			if(flag) {
+				$("#copyAddress").addClass("hide");
+				$("#copyPosition").addClass("hide");
+				$("#createLinkAndCopy").addClass("hide");
+			}
+		}
+		
+		function createLinkAndCopy() {
+			var newLink = createLink();
+			var borrow = $("#location").val();
+			$("#location").val(newLink);
+			$("#location").select();
+			document.execCommand("Copy");
+			$("#location").val(borrow);
+		}
+		
+		function createLinkAndOpen() {
+			var newLink = createLink();
+			window.open(newLink, '_self');
+		}
+		
+		function createLink() {
+			var source = window.location.href;
+			var beforeAsk = source;
+			var indexOfAsk = source.indexOf("?");
+			if(indexOfAsk != -1) {
+				beforeAsk = source.substring(0, indexOfAsk);
+			}
+			console.log(source);
+			console.log(99,beforeAsk);
+			//window.open('/', '_self')
+			var tempAddress = $("#address").val();
+			var tempLocation = $("#location").val();
+			var query = "?";
+			query += "zoom=" + map.getZoom();
+			query += "&location=" + encodeURI(tempLocation);
+			query += "&address=" + encodeURI(tempAddress);
+			var newLocation = beforeAsk + query;
+			
+			return newLocation;
+		}
+		
+		function toHome() {
+			window.location.href = "/";
+		}
+    </script>
+    <style type="text/css">
+		.extend100 {
+			width:100%;
+		}
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<div id="myPageTop">
+    <table width="320" cellpadding="10">
+        <tr>
+            <td>
+            	<input id="checkAddress" type="checkbox" class="btn btn-info btn-sm" style="width:20px">
+            </td>
+            <td width="100%" colspan="2">
+            	<input style="width:100%" type="text" class="form-control" placeholder="输入地址信息，自动提示" id="address">
+            </td>
+        </tr>
+        <tr>
+            <td>
+            	<input id="checkLocation" type="checkbox" class="btn btn-info btn-sm" style="width:20px">
+            </td>
+            <td width="100%">
+            	<input style="width:100%" list="myLocs" type="text" class="form-control" id="location">
+            	<datalist id="myLocs" />
+            </td>
+            <td>
+            	<input id="cleanLocationAndAddress" onClick="cleanLocationAndAddress();" type="button" class="btn btn-info btn-sm" style="width:50px" value="清除">
+            </td>
+        </tr>
+    </table>
+    <span>
+    	<table id="operation" width="320" class="tab"><tr>
+    	<td><input id="copyAddress" onClick="copyAddress();" type="button" class="btn btn-primary btn-sm" style="width:50px" value="≡地址"></td>
+    	<td><input id="copyPosition" onClick="copyPosition();" type="button" class="btn btn-success btn-sm" style="width:50px" value="≡坐标" /></td>
+    	<td><input id="createLinkAndCopy" onClick="createLinkAndCopy();" type="button" class="btn btn-primary btn-sm" style="width:60px" value="≡新链接"></td>
+    	<td><input id="createLinkAndOpen" onClick="createLinkAndOpen();" type="button" class="btn btn-success btn-sm" style="width:60px" value="新地点"></td>
+    	<td width="100%"></td>
+    	<td><input onClick="toHome();" type="button" class="btn btn-primary btn-sm" style="width:70px" value="织望科技" /></td>
+    	</tr></table>
+    </span>
+</div>
+</body>
+</html>

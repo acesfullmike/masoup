@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>相片上传</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script th:inline="javascript">
+		$(document).ready(function() {
+			show();
+		});
+		
+		function show() {
+			var aname = [[${albumName}]];
+			var isedit = [[${isedit}]];
+			
+			if(aname) {
+				$("#ball").val(aname);
+			}
+			
+			if(isedit) {
+				$("#ball").attr("disabled", "disabled");
+				$(document).attr("title", "编辑相册" + aname);
+				var h2 = $("<input></input>").attr("type", "hidden");
+				h2.attr("name", "oldname").attr("id", "oldname").val(aname);
+				$("form").append(h2);
+			} else {
+				$(document).attr("title", "新建相册" + (aname ? aname : ""));
+			}
+			
+			var h1 = $("<input></input>").attr("type", "hidden");
+			h1.attr("name", "isedit").attr("id", "isedit").val(isedit);
+			$("form").append(h1);
+		}
+		
+		function checkForm() {
+			var files =  $("#files").val();
+			var ball = $("#ball").val();
+			console.log(files);
+			console.log(ball);
+			if(!files && !ball) {
+				alert("请选择上传文件，或输入文字");
+				return false;
+			}
+			return true;
+		}
+		
+		function backto() {
+			var url = "/album/list";
+			window.location.href = url;
+		}
+
+	</script>
+	<style type="text/css">
+   	</style>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+	<div class="margin10">
+		<div id="result"></div>
+		<h2 id="top">上传<span onclick="backto();">相</span>片</h2>
+		<div class="margin6" align="center">
+		<form action="/album/save" method="post" enctype="multipart/form-data">
+			<table class="table">
+           		<tr><td align="center" colspan="2">
+		    		<input name="files" id="files" type="file" multiple="multiple" />
+               	</td></tr>
+           		<tr>
+           			<td colspan="2">
+           				<input id="ball" name="ball" class="area form-control" type="text" autofocus />
+           			</td>
+           		</tr>
+           		<tr>
+	           		<td align="center">
+			    		<input class="btn btn-success btn-sm" type="submit" value="↑上传"/>
+	               	</td>
+	            </tr>
+	   	 	</table>
+	    </form>
+		</div>
+	</div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

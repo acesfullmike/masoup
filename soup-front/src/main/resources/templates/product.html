@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>织望科技 - 产品</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script type="text/javascript">
+		$(document).ready(function() {
+													
+		}); 
+	</script>
+	<style type="text/css">
+	.h100 {
+		height:400px;
+	}
+	.m40 {
+		margin: 10px;
+	}
+	.blue {
+		background: gray;
+		border: 3px;
+	}
+	
+	</style>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+	<div class="m40">
+<div>
+	<ul class="list-group">
+	<li class="font20 list-group-item active">产品</li>
+	<a href="#" class="list-group-item">Mas控制台</a>
+	<a href="#" class="list-group-item">公车管理系统</a>
+	<a href="#" class="list-group-item">FPGA云服务器</a>
+	<a href="#" class="list-group-item">黑石物理服务器<span class="badge">新</span></a>
+	<a href="#" class="list-group-item">BGP高防</a>
+	<a href="#" class="list-group-item">DI-X深度学习平台</a>
+	<a href="#" class="list-group-item">移动解析HttpDNS</a>
+	<a href="#" class="list-group-item">人脸识别</a>
+    </ul>
+</div>
+	</div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

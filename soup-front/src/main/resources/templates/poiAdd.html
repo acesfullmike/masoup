@@ -1,0 +1,349 @@
+﻿<!doctype html>
+<html>
+<head>
+    <title>新增兴趣点</title>
+    <meta charset="utf-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    
+    <script src="/js/picker.js"></script>
+    <script src="/js/fish-common.js"></script>
+    <script src="/js/jquery/3.1.1/jquery.min.js"></script>
+    <script src="http://webapi.amap.com/maps?v=1.4.4&key=02a37b38c4b33a671f1cd1584b54adc8&plugin=AMap.Autocomplete"></script>
+    <script src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+
+	<script th:inline="javascript">
+	var item = [[${item}]];
+	var listId, listName;
+	var poiName, longlat, address, category;
+	var sample = [[${sample}]];
+	var fromStray = true;
+	
+	function init() {
+		listName = [[${listName}]];
+		$("#listName").val(listName);
+
+		if(item != null) {
+			//edit mode
+			$("title").text("编辑兴趣点");
+			$("#itemId").val(item.id);
+			console.log(item, item.id);
+			listId = item.listId;
+			poiName = item.name;
+			longlat = item.location;
+			address = item.address;
+			category = item.category;
+			console.log(item, $("#listId").val());
+		} else {
+			$("#myRemove").addClass("hide");
+			listId = [[${listId}]];
+		}
+		$("#listId").val(listId);
+		console.log(listId, listName);
+		console.log(poiName, longlat, address, category);
+
+		if(poiName != null) {
+			$("#poiName").val(poiName).keydown(disableEnter);
+		}
+		
+		if(category != null) {
+			$("#category").val(category).keydown(disableEnter);
+		}
+		
+		if(address != null) {
+			$("#address").val(address).keydown(disableEnter);
+		}
+		
+		if(longlat != null) {
+			$("#location").val(longlat).keydown(disableEnter);
+		}
+
+		$("#mySelect")[0].focus();
+	}
+	
+	function disableEnter(event) {
+		if(event.keyCode==13) {
+			return false;
+		}
+	}
+	
+	$(document).ready(function() {
+			init();
+			pick();
+			
+			if(longlat != null) {
+				setLocation(longlat.trim());
+			}
+	
+			if(sample != null) {
+				new AMap.Marker({
+		  			raiseOnDrag: true,
+		  			position: sample.split(","),
+		  			map: map
+				});
+			}
+			
+			initListSelect();
+			initCategorySelect([[${cates}]]);
+			initLocationsSelect([[${locs}]]);
+		});
+	
+		function updateCategorySelect(listId) {
+			var url;
+			if(listId <= 0) {
+				url = "/poi/lists/category";
+			} else {
+				url = "/poi/list/" + listId + "/category";
+			}
+			var theball = {
+				url : url,
+				type : "GET",
+				dataType : "json",
+				success: function(meat) {
+					console.log("response", meat);
+					initCategorySelect(meat);
+				}
+			}
+			//console.log(theball);
+			$.ajax(theball);
+		}
+		
+		function initListSelect() {
+			var mySelect = $("#mySelect");
+			mySelect.change(function() {
+				var option = $(this).find("option:selected");
+				var listId = option.val();
+				console.log(option.val(), option.text(), 789);
+				console.log("go get ", listId);
+				updateCategorySelect(listId);
+			});
+			var optionTop = $("<option></option>").val(0).text("--选择地图--");
+			mySelect.append(optionTop);
+			var listItems = [[${poiLists}]];
+			console.log(listItems, 999);
+			if(listItems == null) {
+				alert(12);
+				return;
+			}
+			
+			for (var i = 0; i < listItems.length; i += 1) {
+				var item = listItems[i];
+				var name = item.name;
+				var id = item.id;
+				var myOption = $("<option></option>").val(id);
+				myOption.text(name);
+				mySelect.append(myOption);
+				if(listId == id) {
+					myOption.attr("selected", true);
+					fromStray = false;
+				}
+			}
+		}
+		
+		function initCategorySelect(cates) {
+			var mySelect = $("#myCates");
+			mySelect.empty();
+			if(cates == null) {
+				return;
+			}
+			
+			for (var i = 0; i < cates.length; i += 1) {
+				var item = cates[i];
+				var myOption = $("<option></option>").val(item);
+				mySelect.append(myOption);
+			}
+		}
+		
+		function save() {
+			var flag = check();
+			
+			if(!flag) {
+				return false;
+			}
+			
+			$("#listId").val($("#mySelect").val());
+			$("#poiNameX").val($("#poiName").val());
+			$("#categoryX").val($("#category").val());
+			$("#addressX").val($("#address").val());
+			$("#locationX").val($("#location").val());
+			
+			console.log($("#listId").val(),$("#poiNameX").val(),$("#categoryX").val(),$("#addressX").val(),$("#locationX").val());
+			
+			$("#myForm").submit();
+		}
+		
+		function check() {
+			var element = $("#mySelect");
+			var index = element.get(0).selectedIndex;
+			if(index == 0) {
+				element.focus();
+				return false;				
+			}
+			
+			element = $("#poiName");
+			var txt = element.val().trim();
+			var len = txt.length;
+			var limit = 100;
+			if(len == 0) {
+				element.val("").focus();
+				return false;
+			} else if(len > limit) {
+				alert("不能超过" + limit + "个字符");
+				element.focus();
+				return false;
+			}
+			
+			element = $("#category");
+			txt = element.val().trim();
+			len = txt.length;
+			var limit = 50;
+			if(len == 0) {
+				element.val("").focus();
+				return false;
+			} else if(len > limit) {
+				alert("不能超过" + limit + "个字符");
+				element.focus();
+				return false;
+			}
+			
+			element = $("#address");
+			txt = element.val().trim();
+			len = txt.length;
+			var limit = 200;
+			if(len == 0) {
+				element.val("").focus();
+				return false;
+			} else if(len > limit) {
+				alert("不能超过" + limit + "个字符");
+				element.focus();
+				return false;
+			}
+			
+			element = $("#location");
+			txt = element.val().trim();
+			if(!checkLnglat(txt)) {
+			 	alert("不是合法坐标：" + txt);
+			 	return false;
+			}
+			len = txt.length;
+			var limit = 50;
+			if(len == 0) {
+				element.val("").focus();
+				return false;
+			} else if(len > limit) {
+				alert("不能超过" + limit + "个字符");
+				element.focus();
+				return false;
+			}
+			
+			return true;
+		}
+		
+		function clean() {
+			$("#poiName").val("");
+			$("#category").val("");
+			$("#address").val("");
+			$("#location").val("");
+		}
+		
+		function cleanCategory() {
+			$("#category").val("");
+		}
+		
+		function showMap() {
+			var href = "/poi/list/" + listId + "/map";
+			if(fromStray) {
+				href = "/poi/items/stray/map";
+			}
+			window.location.href = href;
+		}
+		
+		function remove() {
+			var url;
+			if(item != null) {
+				var itemId = item.id;
+				var url = "/poi/item/" + itemId + "/remove";
+				window.location.href = url;
+			}
+		}
+    </script>
+    <style type="text/css">
+		.extend100 {
+			width:100%;
+		}
+		.tab{
+	   		border-collapse:collapse;
+   		}
+   		#operation td {
+			padding-right:5px;
+		}
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<div id="myPageTop">
+	<span>
+	<select id="mySelect" placeholder="请选择地图" class="form-control input-sm"></select>
+	</select>
+	</span>
+    <table width="280" cellpadding="10">
+        <tr>
+            <td width="100%" colspan="2">
+                <input required style="width:100%" type="text" class="form-control" placeholder="名称，如: 我的精神故乡" id="poiName">
+            </td>
+        </tr>
+        <tr>
+            <td width="100%">
+            	<!-- 
+            	<input required style="width:100%" type="text" class="form-control" placeholder="类别，如: 住处" id="category">
+            	 -->
+            	<input required list="myCates" style="width:100%" type="text" class="form-control" placeholder="类别，如: 住处" id="category">
+				<datalist id="myCates" />
+            </td>
+            <td>
+            	<input onClick="cleanCategory();" type="button" class="btn btn-info btn-sm" style="width:50px" value="清除">
+            </td>
+        </tr>
+        <tr>
+            <td width="100%" colspan="2">
+                <input style="width:100%" required type="text" class="form-control" placeholder="输入地址信息，自动提示" id="address">
+            </td>
+        </tr>
+        <tr>
+            <td width="100%">
+                <input style="width:100%" list="myLocs" required type="text" class="form-control" id="location">
+                <datalist id="myLocs" />
+            </td>
+            <td>
+            	<input id="cleanLocationAndAddress" onClick="cleanLocationAndAddress();" type="button" class="btn btn-info btn-sm" style="width:50px" value="清除">
+            </td>
+        </tr>
+        <tr>
+            <td width="100%" colspan="2">         
+			<form id="myForm" action="/poi/item/save" method="post">
+				<input id="itemId" type="hidden" name="itemId" value="xxx">
+				<input id="listId" type="hidden" name="listId" value="xxx">
+				<input id="poiNameX" type="hidden" name="poiName">
+				<input id="categoryX" type="hidden" name="category">
+				<input id="locationX" type="hidden" name="location">
+				<input id="addressX" type="hidden" name="address">
+    		</form>
+            </td>
+        </tr>
+    </table>
+    <span>
+    	<table id="operation" width="285" class="tab"><tr>
+    	<td><input onClick="save();" type="button" class="btn btn-success btn-sm" style="width:50px" value="保存"></td>
+    	<td width="100%"></td>
+    	<td><input onClick="clean();" type="button" class="btn btn-info btn-sm" style="width:50px" value="清除"></td>
+    	<td><input id="myRemove" onClick="remove();" type="button" class="btn btn-danger btn-sm" style="width:50px" value="删除" /></td>
+    	<td><input onClick="showMap();" type="button" class="btn btn-warning btn-sm" style="width:50px" value="取消"></td>
+    	</tr></table>
+    </span>
+    
+</div>
+</body>
+</html>

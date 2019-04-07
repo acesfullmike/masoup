@@ -1,0 +1,255 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>相册列表</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script th:inline="javascript">
+
+		$(document).ready(function() {
+			init();
+			xmore();
+		});
+		
+		var router = "/albumcat";
+		var sitename = "雪";
+		
+		var keyword = [[${param.who}]];
+		if(keyword) {
+			pageParam = keyword;
+			sitename += keyword;
+		}
+		
+		var currentpage = 0;
+		var mystart = 1;
+		function init() {
+			$("#navy").append(addAlbumListNavi(sitename));
+			
+			var paramStartpage = [[${param.sp}]];
+			if(paramStartpage) {
+				mystart = paramStartpage;
+			}
+			currentpage = mystart - 1;
+			$("#major").css("table-layout", "fixed");
+			htmlTitle(sitename + "相册列表");
+		}
+
+		var mytotal = "0";
+		var home = [[${param.homein64}]];
+		console.log("home", home);
+		if(!home) {
+			home = base64("https://www.cct58.com/xiezhen/");
+		}
+		var mynext = home;
+		var textb = "正在加载...";
+		function xmore() {
+			$("#xmore").val(textb);
+			$("#xmore").attr("disabled", true);
+			currentpage++;
+			console.log("xmore", currentpage);
+			
+			getImagesByPage(currentpage, mynext);
+		}
+		
+		function getImagesByPage(pagenumber, pageurl) {
+//			console.log("getImagesByPage", pageurl);
+			var weburl = router + "/page/" + pageurl;
+			console.log(pageurl, weburl);
+			
+//			console.log(weburl);
+			var theball = {
+					url : weburl,
+					dataType : "json",
+					success: function(meat) {
+						console.log("At " + pagenumber);
+						var photos = meat.photos;
+						if(meat.totalpage) {
+							mytotal = meat.totalpage;
+						}
+						if(meat.nextpage) {
+							mynext = base64(meat.nextpage);
+						}
+						var texta = "共" + mytotal + "页，当前第" + pagenumber + "页，";
+						console.log(photos.length == 0);
+						if(photos.length != 0) {
+							insertTable(meat);
+							updateOrderNumber();
+							var hasmore = pagenumber < mytotal;
+							if(hasmore) {
+								var more = "点击加载下页...";
+								$("#xmore").val(texta + more);
+								$("#xmore").attr("disabled", false);
+							} else {
+								var more = "没有更多了。";
+								$("#xmore").val(texta + more);
+							}
+						} else {
+							var texta = "共" + mytotal + "页，当前" + pagenumber + "页没有数据。";
+							$("#xmore").val(texta);
+						}
+			        }
+			}
+			$.ajax(theball);
+		}
+		
+		function updateOrderNumber() {
+			var mycount = $(".mylabor").length;
+			$(".mylabor").each(function(index, element) {
+				var outorder = index + 1;
+				$(this).text("#" + outorder + " / " + mycount);
+			});
+			$("#count").text(mycount);
+		}
+		
+		function insertTable(meat) {
+			var albums = meat.photos;
+			for(var myi = 0; myi < albums.length; myi++) {
+				var item = albums[myi];
+				var title = item.title;
+				var albumurl = item.aurl;
+				var who = item.who + 22;
+				var coverurl = item.cover;
+				var count = item.count;
+				var when = item.when;
+				
+				var td = tdOfBreakword();
+				
+				var labor = labelOf("#").addClass("mylabor label-primary")
+				labor.click(function(){
+					var findurl = router + "/search";
+					window.open(findurl, "_blank");
+				});
+				td.append(labor);
+				td.append(knbsp(2));
+				
+				var labelCount = labelOf("?张").addClass("label-default");
+				labelCount.click(getImageCount);
+				labelCount.css("cursor", "pointer");
+				td.append(labelCount);
+				td.append(knbsp(2));
+				
+				var myhref = router + "/show/" + base64(albumurl);
+				var ak = anchorOf(title, myhref);
+				td.append(ak);
+
+				var tags = item.tags;
+				if(tags) {
+					td.append("<br>");
+					
+					//all
+					{
+						var labelTag = labelOf("雨全").addClass("label-danger");
+						labelTag.css("cursor", "pointer");
+						labelTag.click(function() {
+							var homeurl = router + "/words";
+							window.open(homeurl);
+						});
+						td.append(labelTag).append(knbsp(1));
+					}
+					//all
+					
+					for(var name in tags){
+						var style = "label-default";
+						var turl = tags[name];
+//						console.log(17, name, turl);
+						var tin64 = base64(turl);
+						var iscurrent = home == tin64;
+						if(iscurrent) {
+							style = "label-success";
+						}
+						var labelTag = labelOf(name).addClass(style);
+						if(!iscurrent) {
+							labelTag.css("cursor", "pointer");
+							labelTag.data("myname", name);
+							labelTag.data("turl", turl);
+							labelTag.click(function() {
+								var myname = $(this).data("myname");
+								var turl = $(this).data("turl");
+								var homeurl = router + "/list?homein64=" + base64(turl) + "&who=" + encodeURI(myname);
+								window.open(homeurl);
+							});
+						}
+						td.append(labelTag).append(knbsp(1));
+					}
+				}
+				
+				var image = $("<img></img>").attr("alt", "<点击加载封面>");
+				image.addClass("dog").css("max-width", "100%");
+				image.attr("data-mypath", coverurl);
+				image.attr("data-albumurl", albumurl);
+				image.click(function() {
+					var current = $(this);
+
+					var status = current.attr("status");
+					if(status != null) {
+						var albumurl = current.data("albumurl");
+						var href = router + "/show/" + base64(albumurl);
+						window.open(href, "_blank");
+					} else {
+						var status = current.attr("status");
+						current.attr("alt", "<正在加载封面...>");
+						var myPath = current.data("mypath");
+				        loadImage(this, myPath, showImage);
+				        current.attr("status", "full");
+				        current.css("cursor", "pointer");
+					}
+				});
+				image.click();
+				td.append("<br>").append(image);
+				
+				var tr = $("<tr></tr>").append(td);
+				$("#list").append(tr);
+
+				//donation area
+				if(myi == albums.length - 1) {
+					$("#list").append(trOfDonation());
+				}
+				//donation area
+			}
+		}
+		
+		function getImageCount() {
+			var labelArea = $(this);
+			var flagArea = labelArea.data("asked");
+			if(flagArea) {
+				return;
+			}
+			labelArea.attr("data-asked", true);
+			labelArea.css("cursor", "default");
+			var whenasking = "label-info";
+			labelArea.addClass(whenasking);
+
+			var albumurl = labelArea.parent().find("img").data("albumurl");
+			var base64url = router + "/count/" + base64(albumurl);
+			
+			var webData = {base64url : base64url};
+			console.log(webData);
+			var theball = {
+				url : base64url,
+				dataType : "json",
+				success: function(meat) {
+					var area = meat.count;
+					if(area) {
+						labelArea.text(area + "张");
+					} else {
+						labelArea.addClass("label-danger");
+						labelArea.text("无效");
+						labelArea.parent().find("br").remove();
+						labelArea.parent().find("a").remove();
+					}
+		        }
+			}
+			$.ajax(theball);
+		}
+	</script>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+		<div class="margin10">
+			<div th:include="album/albumHeader::listHolder"></div>
+	    </div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>个人信息</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script type="text/javascript">
+		$(document).ready(function() {
+								
+		}); 
+	</script>
+	<style type="text/css">
+	.h100 {
+		height:400px;
+	}
+	.m10 {
+		margin: 10px;
+	}
+	.blue {
+		background: gray;
+		border: 3px;
+	}
+	.middlecenter {
+		vertical-align:middle; 
+		text-align:center;
+	}
+	.right {
+		text-align:right;
+	}
+	</style>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+		<div class="m10">
+		<h2>个人信息</h2>
+		<table id="detail" class="table" border="0">
+	      <tr>
+	        <td width="20%" class="right">
+	        	帐号:
+	        </td>
+	        <td>
+	        	<span id="username" th:if="${user != null}" th:text="${user.username}" />
+	        </td>
+	      </tr>
+	      <tr>
+	        <td width="20%" class="right">
+	        	外号:
+	        </td>
+	        <td>
+	        	<span id="nickname" th:if="${user != null}" th:text="${user.nickname}" />
+	        </td>
+	       </tr>
+	       <tr>
+	        <td width="20%" class="right">
+	        	创建于:
+	        </td>
+	        <td>
+	        	<span id="creation" th:if="${prettyCreation != null}" th:text="${prettyCreation}" />
+	        </td>
+	       </tr>
+	       <tr>
+	        <td width="20%" class="right">
+	        	创建了:
+	        </td>
+	        <td>
+	        	<span id="creation" th:if="${timeago != null}" th:text="${timeago}" />
+	        </td>
+	      </tr>
+	    </table>
+	    </div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

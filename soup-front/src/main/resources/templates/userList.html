@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>用户列表</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script th:inline="javascript">
+		$(document).ready(function() {
+			showInfo();
+			createList();
+		});
+		
+		function showInfo() {
+			var result = [[${result}]];
+			if(result != null) {
+				for(var k = 0; k < result.length; k++) {
+					var item = result[k];
+					var alert = item.error;
+					if(alert != null) {
+						var div = $("<div></div>").attr("align", "center");
+						div.addClass("alert alert-danger");
+						div.text(alert);
+						$("#result").append(div);
+					} 
+					
+					alert = item.info;
+					if(alert != null) {
+						var div = $("<div></div>").attr("align", "center");
+						div.addClass("alert alert-info");
+						div.text(alert);
+						$("#result").append(div);
+					} 
+				}
+			}
+		}
+		
+		function createList() {
+			//poiLists
+			var userItems = [[${userItems}]];
+			console.log(userItems);
+			$("#count").text(userItems.length);
+			for(var k = 0; k < userItems.length; k++) {
+				var user = userItems[k];
+				var id = user.id;
+				var name = user.username;
+				var creation = user.shortCreation;
+				var canRemove = user.canRemove;
+				var canModify = user.canModify;
+				canRemove = true;
+				canModify = true;
+				var row = $("<tr></tr>");
+				var td = $("<td></td>");
+				if(canRemove) {
+					var span = $("<span></span>").addClass("middleright glyphicon glyphicon-remove remove").attr("data-id", id);
+					span.click(function (){
+						var hrefRemove = "/user/" + $(this).data("id") + "/remove";
+						window.location.href=hrefRemove;
+					});
+					td.append(span);
+				}
+				row.append(td);
+				
+				td = $("<td></td>");
+				if(canModify) {
+					var span = $("<span></span>").addClass("middleright glyphicon glyphicon-edit edit").attr("data-id", id);
+					span.click(function (){
+						var hrefEdit = "/user/" + $(this).data("id") + "/edit";
+						window.location.href=hrefEdit;
+					});
+					td.append(span);
+				}
+				row.append(td);
+				
+				td = $("<td></td>").addClass("auto");
+	    		var anchor = $("<a></a>").attr("target", "_self").text(name);
+	    		anchor.attr("href", "/user/" + id + "/detail");
+
+				var span = $("<span></span>").text(name);
+				td.append(anchor);
+				row.append(td);
+				
+				td = $("<td></td>").addClass("auto");
+				span = $("<span></span>").text(creation);
+				td.append(span);
+				row.append(td);
+	    		
+	    		$("#list").append(row);
+			}
+		}
+		
+		function addNew() {
+			var url = "/signup";
+			window.location.href = url;
+		}
+		
+		function refresh() {
+			var url = window.location.href;
+			window.location.href = url;
+		}
+		
+	</script>
+	<style type="text/css">
+	pre {
+		white-space: pre-wrap;
+		word-wrap: break-word;
+	}
+	.auto {
+		word-wrap:break-word;
+		word-break:break-all;
+	}
+	</style>
+</head>
+<body>
+	<div th:replace="header::bodyHead"></div>
+	
+	<div class="margin10">
+		<div id="result"></div>
+		<ul class="list-group">
+		<li class="font20 list-group-item active">共有注册用户 (<span id="count">xxx</span>个)</li>
+	    </ul>
+		<div>
+	        <input class="btn btn-primary btn-sm" type="button" onclick="refresh();" value="刷新" />&nbsp;</span>
+	        <input class="btn btn-success btn-sm" type="button" onclick="addNew();" value="+新增" />&nbsp;</span>
+	    </div>
+		
+	    <table id="myGrid" class="table table-hover bordered">
+	    	<thead>
+	    		<tr>
+	    			<td width="1%" id="myRemove"></td>
+	    			<td width="1%" id="myEdit"></td>
+	    			<td>用户名</td>
+	    			<td>创建时间</td>
+	    		</tr>
+	    	</thead>
+	        <tbody id="list">
+	        </tbody>
+	    </table>
+	</div>
+	
+    <div th:replace="footer::copyright"></div>
+</body>
+</html>

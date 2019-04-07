@@ -1,0 +1,21 @@
+server:
+  port: 81
+  
+spring:
+  application:
+    name: soup-front
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    
+eureka:
+  instance:    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:80/eureka
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 60000
+        readTimeout: 90000

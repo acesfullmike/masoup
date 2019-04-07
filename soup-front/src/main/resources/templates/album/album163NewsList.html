@@ -1,0 +1,96 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>相册列表</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+    <div th:include="album/albumHeader::listJS"></div>
+	<script th:inline="javascript">
+
+		$(document).ready(function() {
+			init();
+			xmore();
+		});
+
+		var router = "/album163news";
+		var rshow = "/album163sports";
+		var sitename = "易新闻";
+		
+		function insertTable(meat) {
+			var albums = meat.photos;
+			for(var myi = 0; myi < albums.length; myi++) {
+				var item = albums[myi];
+				var title = item.setname;
+				var intro = item.desc;
+				var albumurl = item.seturl;
+				var coverurl = item.cover;
+				var when = item.createdate;
+				var count = item.imgsum;
+				console.log(when, count);
+				var td = tdOfBreakword();
+				
+				var labor = labelOf("#").addClass("mylabor label-primary")
+				td.append(labor);
+				td.append(knbsp(2));
+				
+				var labelCount = labelOf(count + "张").addClass("label-info");
+				td.append(labelCount);
+				td.append(knbsp(2));
+				
+				var d1 = when.split(" ")[0];
+				var labelWhen = labelOf(d1).addClass("label-success");
+				td.append(labelWhen);
+				td.append(knbsp(2));
+				
+				var myhref = rshow + "/show/" + base64(albumurl);
+				myhref += "?backto=" + router;
+				var myhref = showHref(rshow, albumurl, router, sitename);
+				var ak = anchorOf(title + "。" + intro, myhref);
+				td.append(ak);
+				
+				var image = $("<img></img>").attr("alt", "<点击加载封面>");
+				image.addClass("dog").css("max-width", "100%");
+				image.attr("data-mypath", coverurl);
+				image.attr("data-albumurl", albumurl);
+				image.click(function() {
+					var current = $(this);
+
+					var status = current.attr("status");
+					if(status != null) {
+						var albumurl = current.data("albumurl");
+						var myhref = showHref(rshow, albumurl, router, sitename);
+						window.open(myhref, "_blank");
+					} else {
+						var status = current.attr("status");
+						current.attr("alt", "<正在加载封面...>");
+						var myPath = current.data("mypath");
+				        loadImage(this, myPath, showImage);
+				        current.attr("status", "full");
+				        current.css("cursor", "pointer");
+					}
+				});
+				image.click();
+				td.append("<br>").append(image);
+				
+				var tr = $("<tr></tr>").append(td);
+				$("#list").append(tr);
+
+				//donation area
+				if(myi == albums.length - 1) {
+					$("#list").append(trOfDonation());
+				}
+				//donation area
+			}
+		}
+	</script>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+		<div class="margin10">
+			<div th:include="album/albumHeader::listHolder"></div>
+	    </div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

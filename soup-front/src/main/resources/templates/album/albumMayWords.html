@@ -1,0 +1,182 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>相册列表</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script th:inline="javascript">
+
+		$(document).ready(function() {
+			$("#xmore").parent().parent().hide();
+			init();
+			initSearch();
+			insertTable();
+		});
+		
+		var toSearchTimer;
+		function initSearch() {
+			$("#criteria").focus();
+			$("#criteria").bind("input", function(){
+				if(toSearchTimer) {
+					clearTimeout(toSearchTimer);
+				}
+				toSearchTimer = setTimeout(function(){
+					filterTags();
+				}, 1000);
+			});
+		}
+		
+		var router = "/albummay";
+		var sitename = "雨全";
+		var currentpage = 0;
+		var mystart = 1;
+		
+		function init() {
+			myNavi();
+			$("#major").css("table-layout", "fixed");
+			htmlTitle(sitename + "相册列表");
+		}
+		
+		function myNavi() {
+			var navi = $("#navy");
+			navi.append(anchorOfSelf("相册", "/albums"));
+			navi.append(" » ").append(anchorOfSelf(sitename, router + "/list"));
+			navi.append("(");
+			navi.append($("<span>0</span>").attr("id", "count"));
+			navi.append("个)");
+			
+			return navi;
+		}
+
+		var mystyle = "label-default";
+		function filterTags() {
+			var mycry = $.trim($("#criteria").val());
+			//var mystyle = "label-default";
+			var mycount = 0;
+			$(".mylabor").each(function(index, element) {
+				$(this).parent().hide();
+				var myval = $(this).text();
+				var isDefault = mystyle == "label-default";
+				var isGood = false;
+				if(!mycry && isDefault) {
+					isGood = true;
+				} else if(!mycry && !isDefault) {
+					if($(this).hasClass(mystyle)) {
+						isGood = true;
+					}
+				} else if(mycry && isDefault) {
+					if(has(myval, mycry)) {
+						isGood = true;
+					}
+				} else if(mycry && !isDefault) {
+					if(has(myval, mycry) && $(this).hasClass(mystyle)) {
+						isGood = true;
+					}
+				}
+				if(isGood) {
+					$(this).parent().show();
+					mycount++;
+				}
+			});
+			$("#kount").text(mycount);
+		}
+		
+		function changeStyle(birdStyle) {
+			$(".myradio").each(function(index, element) {
+				$(this).removeClass("label").css("color", "white");
+				if(!$(this).hasClass(birdStyle)) {
+					$(this).addClass("label");
+				}
+			});
+		}
+
+		var styles = ["primary", "success", "info", "warning", "danger"];
+		function insertTable() {
+			var tags = [[${tags}]];
+			{
+				var td = tdOfBreakword();
+				var style = "label-default";
+				var what = labelOf("全部").addClass(style).addClass("myradio");
+				what.removeClass("label").css("color", "white");
+				what.attr("data-style", style);
+				what.click(function() {
+					mystyle = $(this).data("style");
+					changeStyle(mystyle);
+					filterTags();
+				});
+				td.append(what).append(knbsp(2));
+				
+				for(var k in styles) {
+					var style = "label-" + styles[k];
+					var what = labelOf(repeat(".", 10)).addClass(style).addClass("myradio");
+					what.attr("data-style", style);
+					what.click(function() {
+						mystyle = $(this).data("style");
+						changeStyle(mystyle);
+						filterTags();
+					});
+					td.append(what).append(knbsp(2));
+				}
+				var tr = $("<tr></tr>").append(td);
+				$("#list").append(tr);
+			}
+			
+			td = tdOfBreakword();
+			var count = 0;
+			for(var tid in tags) {
+				var item = tags[tid];
+				var name = item.word;
+				var turl = item.url;
+				var indexA = (count++) % styles.length;
+				var style = "label-" + styles[indexA];
+				var homeurl = router + "/list?homein64=" + base64(turl) + "&who=" + encodeURI(name);
+				var atag = anchorOf(" " + name + " ", homeurl).addClass(style).addClass("mylabor");
+				atag.css("color", "white");
+
+				var tspan = $("<span></span>").append(atag).append(knbsp(1));
+				td.append(tspan);
+			}
+			$("#kount").text(count);
+			$("#count").text(count);
+			var tr = $("<tr></tr>").append(td);
+			$("#list").append(tr);
+		}
+	</script>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+		<div class="margin10">
+		<h2 id="top">
+			<span id="navy"></span>
+			<input class="btn btn-primary btn-sm" type="button" onclick="refresh();" value="刷新" />
+		</h2>
+		</div>
+		
+	    <table id="major" class="table table-hover">
+	    	<tr>
+			  <td>
+			  	<a href="#bottom" style="font-style:italic">去到底部</a>
+			  	&nbsp;
+			  	<input id="criteria" type="text" class="form-control input-sm" style="width:150px;display:inline">
+			  	<label id="kount" class="label label-primary" >0</label>
+			  </td>
+			</tr>
+	        <tbody id="list">
+	        </tbody>
+	        <tbody id="more">
+		        <tr>
+				  <td>
+				  	<input id="xmore" style="width:100%" class="btn btn-success btn-sm" type="button" onclick="xmore();" value="加载更多..." />
+				  </td>
+				</tr>
+		        <tr id="bottom">
+				  <td><a href="#top" style="font-style:italic">回到顶部</a></td>
+				</tr>
+	        </tbody>
+	    </table>
+	    </div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

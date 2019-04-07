@@ -1,0 +1,102 @@
+.results tr[visible='false'], .no-result {
+	display: none;
+}
+
+.results tr[visible='true'] {
+	display: table-row;
+}
+
+a.blueHover:hover {
+	color: #0000FF;
+}
+
+a.whiteFront {
+	color: #FFFFFF;
+}
+
+a.white2 {
+	color: #DDDDDD;
+}
+
+.darkback {
+	background: #424860;
+	color: #DDDDDD;
+}
+
+.padding-6 {
+	padding: 6px;
+}
+
+.align-right {
+	text-align: right;
+}
+
+.align-center {
+	text-align: center;
+}
+
+.valign-middle {
+	vertical-align: middle;
+}
+
+.a-center {
+	text-align: center;
+}
+
+.va-center {
+	vertical-align: middle;
+}
+
+.div-one-line {
+	float: left;
+}
+
+.width70 {
+	width: 70px;
+}
+
+.width80 {
+	width: 60%;
+}
+
+.height70 {
+	height: 70px;
+}
+
+.font-header {
+	font-size: 40px
+}
+
+.pad-t30 {
+	padding-top: 10px;
+	padding-left: 6px;
+}
+
+.pad-lr10 {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.pad-tb10 {
+	padding-top: 20px;
+	padding-bottom: 10px;
+}
+.margin10 {
+	margin: 10px;
+}
+.margin6 {
+	margin: 6px;
+}
+.cursor-cross {
+	cursor:crosshair;	
+}
+.cursor-auto {
+	cursor:auto;	
+}
+
+.hide {
+	display:none;
+}
+.show {
+	display:nonex;
+}

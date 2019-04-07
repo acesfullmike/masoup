@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>织望科技 - 车辆文件上传</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script type="text/javascript">
+		$(document).ready(function() {
+													
+		}); 
+	</script>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+
+	<div class="margin6">
+		<div>
+		提取流程：
+<br>1、根据《2018清明车辆记录》“行政”工作表里的“车牌号码”，选出出现次数5次以上的“单位名称”（简称A）、“单位性质”（简称B）、“出现次数”（简称C），根据C在《2018清明车辆记录》“行政明细”工作表里筛选出“设备编号”（简称D）和“过车时间”（简称E）；
+<br>2、根据C在《全区党政机关及参公车单位辆查询结果》查找车型（简称F），比如车牌号桂M60552对应车型广州本田雅阁2.0 AT轿车。
+<br>3、生成总表，总表包含ABCDEF，意思就是罗列出现次数5次以上车辆的单位名称、单位性质、出现次数、设备编号、过车时间、车型。	
+		</div>	
+		<form action="/sword/upload" method="post"  enctype="multipart/form-data">
+		    <table id="detail" class="table table-hover table-bordered results">
+		      <tr>
+		        <td align="right">记录：</td>
+		        <td><input required name="cars" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" /></td>
+		      </tr>
+		      <tr>
+		        <td align="right">车型：</td>
+		        <td><input required name="goes" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" /></td>
+		      </tr>
+		      <tr>
+		        <td align="right">次数：</td>
+		        <td><input type="number" name="times" min="1" max="1000" value="5" /></td>
+		      </tr>
+		      <tr>
+		        <td align="right"></td>
+		        <td><input class="btn btn-success" type="submit" value="上传文件并执行提取流程"/><br/></td>
+		      </tr>
+		      <tbody>
+		      </tbody>
+		    </table>
+	    </form>
+	</div>
+		
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>

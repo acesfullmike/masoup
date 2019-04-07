@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>织望科技 - 文件上传</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/assets/zw-ico.jpg">
+    <div th:include="header::headPart"></div>
+	<script type="text/javascript">
+		$(document).ready(function() {
+		});
+		
+		function checkForm() {
+			var files =  $("#files").val();
+			var ball = $("#ball").val();
+			console.log(files);
+			console.log(ball);
+			if(!files && !ball) {
+				alert("请选择上传文件，或输入文字");
+				return false;
+			}
+			return true;
+		}
+	</script>
+	<style type="text/css">
+   	</style>
+</head>
+
+<body>
+	<div th:replace="header::bodyHead"></div>
+
+	<div class="margin6" align="center">
+		<form action="/file/upload" method="post" onsubmit="return checkForm();" enctype="multipart/form-data">
+			<table class="table">
+           		<tr><td align="center" colspan="2">
+		    		<input name="files" id="files" type="file" multiple="multiple" />
+               	</td></tr>
+           		<tr><td align="center" colspan="2">
+		    		<textarea name="ball" id="ball" placeholder="1. 传文件点“选择文件” 2. 传文字写这里  3. 可同时上传文件和文字" class="area form-control" rows="6"></textarea>
+               	</td></tr>
+           		<tr><td align="right" width="50%">
+		    		<input class="btn btn-success btn-sm" type="submit" value="↑上传"/>
+               	</td>
+           		<td align="left">
+		    		<input class="btn btn-primary btn-sm" type="button" onclick="window.open('/file/list', '_self')" value="文件列表"/>
+               	</td></tr>
+	   	 	</table>
+	    </form>
+	</div>
+	<div th:replace="footer::copyright"></div>
+</body>
+</html>
