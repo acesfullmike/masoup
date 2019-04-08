@@ -29,6 +29,6 @@
     </dependencies>
     
     <build>
-    	<finalName>soup-registry</finalName>
+    	<finalName>${artifactId}</finalName>
     </build>
 </project>

@@ -7,6 +7,7 @@ spring:
   cloud:
     config:      server:        git:          uri: https://github.com/acesfullmike/konfig.git
           username: acesfullmike
+          password: ${git.pwd}
 
 eureka:
   instance:    prefer-ip-address: true

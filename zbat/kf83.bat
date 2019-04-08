@@ -1,3 +1,3 @@
 @echo off
 
-call ka 86
+call kf 83

@@ -15,7 +15,9 @@
 		<module>soup-registry</module>
 		<module>soup-album</module>
 		<module>soup-front</module>
+		<module>soup-sos</module>
 		<module>soup-config</module>
+		<module>soup-kfc</module>
 		<module>soup-common</module>
 	</modules>
 

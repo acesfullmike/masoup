@@ -1,3 +1,3 @@
 @echo off
 
-call ks 90
+call kr 80
